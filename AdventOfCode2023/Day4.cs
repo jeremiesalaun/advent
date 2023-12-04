@@ -56,8 +56,10 @@ namespace AdventOfCode2023
                     cards.Add(ParseLine(sr.ReadLine()));
                 }
             }
-            //int total = cards.Sum(c=>c.GetScore());
-            for(int i=0; i<cards.Count; i++)
+            int total1 = cards.Sum(c=>c.GetScore());
+            Console.WriteLine($"Final result for 1st star is : {total1}");
+
+            for (int i=0; i<cards.Count; i++)
             {
                 var card = cards[i];
                 for(int j=1;j<=card.CountPoints(); j++)
@@ -65,9 +67,9 @@ namespace AdventOfCode2023
                     cards[i + j].Copies+=card.Copies;
                 }
             }
-            int total = cards.Sum(c => c.Copies);
+            int total2 = cards.Sum(c => c.Copies);
             //Print out total result
-            Console.WriteLine($"Final result is : {total}");
+            Console.WriteLine($"Final result for 2nd start is : {total2}");
         }
 
         private card ParseLine(string? line)

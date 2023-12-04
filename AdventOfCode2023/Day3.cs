@@ -47,35 +47,45 @@ namespace AdventOfCode2023
                     rows.Add(ParseLine(sr.ReadLine(), rows.Count));
                 }
             }
-            int total = 0;
+            int total1 = 0;
+            int total2 = 0;
             //Process rows
             for (int i = 0; i < rows.Count; i++)
             {
                 var r = rows[i];
                 foreach (var n in r.numbers)
                 {
+                    var isPartNumber = false;
                     var rmin = Math.Max(0, n.row - 1);
                     var rmax = Math.Min(rows.Count - 1, n.row + 1);
                     var cmin = Math.Max(0, n.colstart - 1);
                     var cmax = Math.Min(r.rowlength - 1, n.colend + 1);
                     for (int j = rmin; j <= rmax; j++)
                     {
+                        if (rows[j].symbols.Exists(s=> s.column >= cmin && s.column <= cmax))
+                        {
+                            isPartNumber = true;
+                        }
                         foreach(var s in rows[j].symbols.Where(s => s.character=='*' &&  s.column >= cmin && s.column <= cmax).ToList())
                         {
                             s.numbers.Add(n.value);
                             s.isgear = (s.numbers.Count==2);
                         }
                     }
+                    if(isPartNumber) {
+                        total1 += n.value;
+                    }
                 }
             }
+            Console.WriteLine($"Final result for 1st star is : {total1}");
             //Calculate total power
-            foreach(var g in rows.SelectMany(r => r.symbols).Where(s => s.isgear))
+            foreach (var g in rows.SelectMany(r => r.symbols).Where(s => s.isgear))
             {
                 Console.WriteLine($"The gear at {g.row}:{g.column} has the numbers {g.numbers[0]} and {g.numbers[1]}");
-                total += g.numbers[0] * g.numbers[1];
+                total2 += g.numbers[0] * g.numbers[1];
             }
             //Print out total result
-            Console.WriteLine($"Final result is : {total}");
+            Console.WriteLine($"Final result for 2nd start is : {total2}");
         }
 
         private row ParseLine(string? line, int rowindex)

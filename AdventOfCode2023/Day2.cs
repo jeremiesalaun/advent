@@ -56,17 +56,19 @@ namespace AdventOfCode2023
                     games.Add(ParseGame(sr.ReadLine()));
                 }
             }
-            int total = 0;
+            int total1 = 0;
+            int total2 = 0;
             foreach (var game in games)
             {
-                //if (game.IsPossible(12,13,14))
-                //{
-                //    total += game.id;
-                //}
-                total += game.Power();
+                if (game.IsPossible(12, 13, 14))
+                {
+                    total1 += game.id;
+                }
+                total2 += game.Power();
             }
             //Print out total result
-            Console.WriteLine($"Final result is : {total}");
+            Console.WriteLine($"Final result for 1st star is : {total1}");
+            Console.WriteLine($"Final result for 2nd star is : {total2}");
         }
 
         private Game ParseGame(string line)
