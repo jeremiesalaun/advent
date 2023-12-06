@@ -4,7 +4,7 @@
     {
         async static Task Main(string[] args)
         {
-            new Day5().Run();
+            new Day6().Run();
             //await Scoreboard.Show();
         }
     }
