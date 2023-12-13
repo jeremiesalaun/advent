@@ -16,8 +16,9 @@ namespace AdventOfCode2023
 {
     internal class Day12
     {
-
-        private class row { 
+        private Dictionary<string, long> cache = new Dictionary<string, long>();
+        private class row
+        {
             public char[] springs { get; set; }
             public List<int> brokenGroups { get; set; } = [];
             public void Unfold(int times)
@@ -25,12 +26,12 @@ namespace AdventOfCode2023
                 char[] c = new char[springs.Length * times + (times - 1)];
                 var b = new List<int>();
                 var u = new List<string>();
-                for(int i = 0; i < times; i++)
+                for (int i = 0; i < times; i++)
                 {
-                    springs.CopyTo(c, i * springs.Length+i);
+                    springs.CopyTo(c, i * springs.Length + i);
                     if (i < times - 1)
                     {
-                        c[springs.Length * (i+1) + i] = '?';
+                        c[springs.Length * (i + 1) + i] = '?';
                     }
                     b.AddRange(brokenGroups);
                 }
@@ -50,125 +51,92 @@ namespace AdventOfCode2023
                     rows.Add(ParseLine(sr.ReadLine()));
                 }
             }
-            
+
+
             long total1 = 0;
-            total1 = rows.AsParallel()
-                        .WithDegreeOfParallelism(8)
-                        .Sum(row =>
-                        {
-                            //Console.WriteLine($"\t{new string(row.springs)} {string.Join(',',row.brokenGroups)}");
-                            var re = BuildRegex(row.brokenGroups, 0);
-                            var hash = new Dictionary<(int pos, int rem,int remg), long>();
-                            var remainingHashes = row.brokenGroups.Sum()-row.springs.Count(c=>c=='#');
-                            var line = new char[row.springs.Length];
-                            row.springs.CopyTo(line,0);
-                            var l = CheckPossible(re, line,0,remainingHashes, row.brokenGroups.Count, hash);
-                            return l;
-                        });            
+            foreach (var row in rows)
+            {
+                var r = Calculate(row.springs, row.brokenGroups);
+                total1 += r;
+            }
 
             Console.WriteLine($"Final result for 1st star is : {total1}");
 
-            long total2 = 0;
             rows.ForEach(r => r.Unfold(5));
-
-            total2 = rows.AsParallel()
-                        .WithDegreeOfParallelism(8)
-                        .Sum(row =>
-                        {
-                            var re = BuildRegex(row.brokenGroups, 0);
-                            var hash = new Dictionary<(int pos, int rem, int remg), long>();
-                            var remainingHashes = row.brokenGroups.Sum() - row.springs.Count(c => c == '#');
-                            var line = new char[row.springs.Length];
-                            row.springs.CopyTo(line, 0);
-                            var l = CheckPossible(re, line, 0, remainingHashes, row.brokenGroups.Count, hash);
-                            Console.WriteLine($"{l} possibilities for {new string(line)}");
-                            return l;
-                        });
+            long total2 = 0;
+            foreach (var row in rows)
+            {
+                var r = Calculate(row.springs, row.brokenGroups);
+                //Console.WriteLine($"{new string(row.springs)} {string.Join(',', row.brokenGroups)}: {r}");
+                total2 += r;
+            }
             Console.WriteLine($"Final result for 2nd star is : {total2}");
         }
 
-        private long CheckPossible(Regex re, char[] line,int startIndex,int remainingHashes,int remainingGroups, Dictionary<(int pos,int rem,int remg), long> hash,bool disableCache=false)
+        private long Calculate(char[] springs, List<int> brokenGroups)
         {
-            int i = startIndex;
-            //if (remainingHashes == 0)
-            //{
-            //    for (int j = i; j < line.Length; j++)
-            //    {
-            //        if (line[j] == '?')
-            //        {
-            //            line[j] = '.';
-            //        }
-            //    }
-            //    i = line.Length;
-            //}
-            while (i<line.Length && line[i]!='?')
+            var cacheKey = $"{new string(springs)}_{string.Join('|', brokenGroups)}";
+            if (!cache.ContainsKey(cacheKey))
             {
-                if (i>0 && line[i]=='.' && line[i - 1] == '#')
-                {
-                    remainingGroups--;
-                }
-                i++;
+                cache.Add(cacheKey, InternalCalculate(springs, brokenGroups));
             }
-            if (i==line.Length)
-            {
-                //Console.WriteLine($"\t{new string(line)}");
-                return 1;
-            }
-            else if (!disableCache && hash.ContainsKey((i,remainingHashes,remainingGroups)))
-            {
-                //Console.WriteLine($"\t{new string(line)},position {i}, {remainingHashes}# left, {remainingGroups}g left : already evaluated : {hash[(i, remainingHashes, remainingGroups)]} possibilities");
-                return hash[(i, remainingHashes,remainingGroups)];
-            }
-            else
-            {
-                long result = 0;
-                var line1 = new char[line.Length];
-                line.CopyTo(line1, 0);
-                if (remainingHashes > 0)
-                {
-                    line1[i] = '#';                    
-                    if (TestHypo(re, line1))
-                    {
-                        result += CheckPossible(re, line1,i+1,remainingHashes-1,remainingGroups, hash,disableCache);
-                    }
-                }
-                line1[i] = '.';
-                if (TestHypo(re, line1))
-                {
-                    var remg = remainingGroups;
-                    if (i>0 && line1[i - 1] == '#')
-                    {
-                        remg--;
-                    }
-                    result+= CheckPossible(re, line1,i+1,remainingHashes,remg,hash,disableCache);
-                }
-                if(!disableCache) hash[(i,remainingHashes,remainingGroups)] = result;
-                return result;
-            }
+            return cache[cacheKey];
         }
 
-        private bool TestHypo(Regex re, char[] line)
+        private long InternalCalculate(char[] springs, List<int> brokenGroups)
         {
-            var l = new string(line);
-            var r= re.IsMatch(l);
-            //Console.WriteLine($"Match for {l} is {r}");
-            return r;
-        }
-
-        private Regex BuildRegex(List<int> brokenGroups, int startingGroup)
-        {
-            var sb = new StringBuilder();
-            sb.Append(@"^[\.\?]*");
-            for(int i=startingGroup; i<brokenGroups.Count ; i++)
+            if (brokenGroups.Count == 0)
             {
-                sb.Append(@"[#\?]{"+ brokenGroups[i] +"}");
-                if(i< brokenGroups.Count - 1)
-                {
-                    sb.Append(@"[\.\?]+");
-                }
+                return springs.Contains('#') ? 0 : 1;
             }
-            sb.Append(@"[\.\?]*$");
-            return new Regex(sb.ToString());
+            if (springs.Length == 0)
+            {
+                return 0;
+            }
+            switch (springs[0])
+            {
+                case '.':
+                    var i = 0; //Eat all the dots
+                    while (i < springs.Length && springs[i] == '.')
+                    {
+                        i++;
+                    }
+                    return Calculate(springs[i..], brokenGroups);
+                case '?':
+                    var sp = springs[..];
+                    sp[0] = '#';
+                    var r = Calculate(sp, brokenGroups); //Evaluate if we put a #
+                    return r + Calculate(springs[1..], brokenGroups); //Consider we put a . and skip to next position
+                case '#':
+                    var g = brokenGroups[0];
+                    if (springs.Length < g)
+                    {
+                        //Not enough chars left for this group
+                        return 0;
+                    }
+                    var n = 0;
+                    while (n < g && (springs[n] == '#' || springs[n] == '?'))
+                    {
+                        n++;
+                    }
+                    if (n == g) //We completed the group so let's go to the next
+                    {
+                        if (n < springs.Length) //Next 2 conditions only if we are not already at the end
+                        {
+                            //The group MUST be followed by a '.'
+                            if (springs[n] == '#') return 0;
+                            //The next char must be ., so we skip it
+                            n++;
+                        }
+                        return Calculate(springs[n..], brokenGroups[1..]);
+                    }
+                    else if (n < g) //We reached end of group before length of group, so we are KO
+                    {
+                        return 0;
+                    }
+                    break;
+            }
+            return 0;
         }
 
         private row ParseLine(string line)
