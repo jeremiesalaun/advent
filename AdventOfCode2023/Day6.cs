@@ -37,6 +37,7 @@ namespace AdventOfCode2023
         }
         public void Run()
         {
+            Console.WriteLine("#################################### WELCOME TO DAY 6 !! ##################################\r\n");
             //Inputs
             var races = new race[] {
                 new race(44, 208),
@@ -63,6 +64,8 @@ namespace AdventOfCode2023
             var longRace = new race(44806572, 208158110501102);
             long result2 = GetNbWin(longRace, 0, longRace.Time, true);
             Console.WriteLine($"Final result for 2nd star is : {result2}");
+            Console.WriteLine($"**************************** END OF DAY 6 ***********************************\r\n");
+            Thread.Sleep(1000);
         }
 
         private long GetNbWin(race r, long curMin, long curMax, bool isLeft)

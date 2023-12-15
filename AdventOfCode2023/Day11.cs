@@ -18,6 +18,7 @@ namespace AdventOfCode2023
     {
         public void Run()
         {
+            Console.WriteLine("#################################### WELCOME TO DAY 11 !! ##################################\r\n");
             var galaxies = new List<Point>();
             //Read and parse file
             var inputpath = @"Inputs\day11.txt";
@@ -59,6 +60,8 @@ namespace AdventOfCode2023
             }
             Console.WriteLine($"Final result for 1st star is : {total1}");
             Console.WriteLine($"Final result for 2nd star is : {total2}");
+            Console.WriteLine($"**************************** END OF DAY 11 ***********************************\r\n");
+            Thread.Sleep(1000);
         }
 
         private int Expand(int value,HashSet<int> notExpandedValues,int expansion)

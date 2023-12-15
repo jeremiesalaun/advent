@@ -18,6 +18,7 @@ namespace AdventOfCode2023
         private char[,] map;
         public void Run()
         {
+            Console.WriteLine("#################################### WELCOME TO DAY 10 !! ##################################\r\n");
             map = new char[140, 140];
             Point start = default;
             //Read and parse file
@@ -132,6 +133,8 @@ namespace AdventOfCode2023
             total2 = CountZeroes(map2);
             Print(map, map2);
             Console.WriteLine($"Final result for 2nd star is : {total2}");
+            Console.WriteLine($"**************************** END OF DAY 10 ***********************************\r\n");
+            Thread.Sleep(1000);
         }
 
         private long CountZeroes(int[,] map2)

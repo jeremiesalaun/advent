@@ -19,6 +19,7 @@ namespace AdventOfCode2023
 
         public void Run()
         {
+            Console.WriteLine("#################################### WELCOME TO DAY 8 !! ##################################\r\n");
             //Read and parse file
             var path = @"Inputs\day8.txt";
             using (var sr = new StreamReader(path, true))
@@ -88,6 +89,8 @@ namespace AdventOfCode2023
             long total2 = factors.Select(kvp => (long) Math.Pow(kvp.Key,kvp.Value)).Aggregate((k1, k2) => k1 * k2);
 
             Console.WriteLine($"Final result for 2nd star is : {total2}");
+            Console.WriteLine($"**************************** END OF DAY 8 ***********************************\r\n");
+            Thread.Sleep(1000);
         }
         private (string point,string left, string right, bool win) ParseLine(string line)
         {

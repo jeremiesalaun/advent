@@ -162,6 +162,7 @@ namespace AdventOfCode2023
 
         public void Run()
         {
+            Console.WriteLine("#################################### WELCOME TO DAY 7 !! ##################################\r\n");
             var hands = new List<hand>();
             //Read and parse file
             var path = @"Inputs\day7.txt";
@@ -194,6 +195,8 @@ namespace AdventOfCode2023
             }
             //Print out total result
             Console.WriteLine($"Final result for 2nd start is : {total2}");
+            Console.WriteLine($"**************************** END OF DAY 7 ***********************************\r\n");
+            Thread.Sleep(1000);
         }
 
         private string FormatStrength(List<(int count, char card)> list)

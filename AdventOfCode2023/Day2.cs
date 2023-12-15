@@ -45,6 +45,7 @@ namespace AdventOfCode2023
         }
         public void Run()
         {
+            Console.WriteLine("#################################### WELCOME TO DAY 2 !! ##################################\r\n");
             var games = new List<Game>();
             //Read file
             var path = @"Inputs\day2.txt";
@@ -69,6 +70,8 @@ namespace AdventOfCode2023
             //Print out total result
             Console.WriteLine($"Final result for 1st star is : {total1}");
             Console.WriteLine($"Final result for 2nd star is : {total2}");
+            Console.WriteLine($"**************************** END OF DAY 2 ***********************************\r\n");
+            Thread.Sleep(1000);
         }
 
         private Game ParseGame(string line)

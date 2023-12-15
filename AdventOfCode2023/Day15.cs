@@ -98,6 +98,7 @@ namespace AdventOfCode2023
 
             Console.WriteLine($"Final result for 2nd star is : {total2}");
             Console.WriteLine($"**************************** END OF DAY 15 ***********************************\r\n");
+            Thread.Sleep(1000);
         }
 
         private long GetFocusingPower(Dictionary<int, (List<Lens> lenses, List<string> operations)> boxes)
@@ -120,9 +121,12 @@ namespace AdventOfCode2023
                 Console.Write($"BOX {kvp.Key}\t");
                 foreach (var lens in kvp.Value.lenses)
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.Write($"[{lens.Label} {lens.Length}]");
                 }
-                Console.WriteLine("\t\t" + string.Join(',', kvp.Value.operations));
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine("\t" + string.Join(',', kvp.Value.operations));
+                Console.ResetColor();
             }
         }
 

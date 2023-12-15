@@ -43,6 +43,7 @@ namespace AdventOfCode2023
 
         public void Run()
         {
+            Console.WriteLine("#################################### WELCOME TO DAY 5 !! ##################################\r\n");
             //Read and parse file
             var path = @"Inputs\day5.txt";
             using (var sr = new StreamReader(path, true))
@@ -104,6 +105,8 @@ namespace AdventOfCode2023
 
             //Print out total result
             Console.WriteLine($"Final result for 2nd star is : {result2}");
+            Console.WriteLine($"**************************** END OF DAY 5 ***********************************\r\n");
+            Thread.Sleep(1000);
         }
 
         private long GetTarget(long source, List<range> dic)

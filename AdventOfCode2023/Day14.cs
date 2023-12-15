@@ -22,6 +22,7 @@ namespace AdventOfCode2023
 
         public void Run()
         {
+            Console.WriteLine("#################################### WELCOME TO DAY 14 !! ##################################\r\n");
             //Read and parse file
             var inputpath = @"Inputs\day14.txt";
             using (var sr = new StreamReader(inputpath, true))
@@ -70,6 +71,8 @@ namespace AdventOfCode2023
             }
             long total2 = Evaluate();
             Console.WriteLine($"Final result for 2nd star is : {total2}");
+            Console.WriteLine($"**************************** END OF DAY 14 ***********************************\r\n");
+            Thread.Sleep(1000);
         }
 
         private string MakeKey()

@@ -37,6 +37,7 @@ namespace AdventOfCode2023
 
         public void Run()
         {
+            Console.WriteLine("#################################### WELCOME TO DAY 3 !! ##################################\r\n");
             var rows = new List<row>();
             //Read and parse file
             var path = @"Inputs\day3.txt";
@@ -85,7 +86,9 @@ namespace AdventOfCode2023
                 total2 += g.numbers[0] * g.numbers[1];
             }
             //Print out total result
-            Console.WriteLine($"Final result for 2nd start is : {total2}");
+            Console.WriteLine($"Final result for 2nd star is : {total2}");
+            Console.WriteLine($"**************************** END OF DAY 3 ***********************************\r\n");
+            Thread.Sleep(1000);
         }
 
         private row ParseLine(string? line, int rowindex)

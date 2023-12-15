@@ -46,6 +46,7 @@ namespace AdventOfCode2023
         }
         public void Run()
         {
+            Console.WriteLine("#################################### WELCOME TO DAY 4 !! ##################################\r\n");
             var cards = new List<card>();
             //Read and parse file
             var path = @"Inputs\day4.txt";
@@ -70,6 +71,8 @@ namespace AdventOfCode2023
             int total2 = cards.Sum(c => c.Copies);
             //Print out total result
             Console.WriteLine($"Final result for 2nd start is : {total2}");
+            Console.WriteLine($"**************************** END OF DAY 4 ***********************************\r\n");
+            Thread.Sleep(1000);
         }
 
         private card ParseLine(string? line)

@@ -11,7 +11,9 @@ namespace AdventOfCode2023
     {
         public void Run()
         {
-            int total=0;
+            Console.WriteLine("#################################### WELCOME TO DAY 1 !! ##################################\r\n");
+            int total1 = 0;
+            int total2=0;
             //Read file
             var path = @"Inputs\day1.txt";
             using (var sr = new StreamReader(path, true))
@@ -20,11 +22,32 @@ namespace AdventOfCode2023
                 {
                     //For each line in file, manage line and retrieve number
                     //Add results
-                    total += ManageLine(sr.ReadLine());
+                    total1 += ManageLineDigitsOnly(sr.ReadLine());
+                    total2 += ManageLine(sr.ReadLine());
                 }
             }
             //Print out total result
-            Console.WriteLine($"Final result is : {total}");
+            Console.WriteLine($"Final result for 1st star is : {total1}");
+            Console.WriteLine($"Final result for 2nd star is : {total2}");
+            Console.WriteLine($"**************************** END OF DAY 1 ***********************************\r\n");
+            Thread.Sleep(1000);
+        }
+
+        private int ManageLineDigitsOnly(string line)
+        {
+            var refirst = new Regex(@"(?<digit>\d)");
+            var relast = new Regex(@".*(?<lastdigit>\d).*");
+            if (line == null) return 0;
+            line = line.ToLower();
+            var mfirst = refirst.Match(line);
+            var mlast = relast.Match(line);
+            int result = 0;
+            if (mfirst.Success && mlast.Success)
+            {
+                result = ParseDigit(mfirst.Groups["digit"].Value) * 10 + ParseDigit(mlast.Groups["lastdigit"].Value);
+            }
+            //Console.WriteLine($"Digit for line {line} is {result}");
+            return result;
         }
 
         private int ManageLine(string line)
@@ -40,7 +63,7 @@ namespace AdventOfCode2023
             {
                 result = ParseDigit(mfirst.Groups["digit"].Value) * 10 + ParseDigit(mlast.Groups["lastdigit"].Value);
             }
-            Console.WriteLine($"Digit for line {line} is {result}");
+            //Console.WriteLine($"Digit for line {line} is {result}");
             return result;
         }
 

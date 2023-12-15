@@ -16,6 +16,7 @@ namespace AdventOfCode2023
     {
         public void Run()
         {
+            Console.WriteLine("#################################### WELCOME TO DAY 9 !! ##################################\r\n");
             var series = new List<List<long>>();
             //Read and parse file
             var path = @"Inputs\day9.txt";
@@ -39,6 +40,8 @@ namespace AdventOfCode2023
             }
             Console.WriteLine($"Final result for 1st star is : {total1}");
             Console.WriteLine($"Final result for 2nd star is : {total2}");
+            Console.WriteLine($"**************************** END OF DAY 9 ***********************************\r\n");
+            Thread.Sleep(1000);
         }
 
         private List<long> ParseLine(string line)
@@ -58,8 +61,10 @@ namespace AdventOfCode2023
             {
                 List<long> deltas = GetDeltas(series);
                 var (d0,dn) = FindNextAndPrevious(deltas);
-                Console.WriteLine($"\tAnswer ({series[0] - d0},{series[series.Count - 1] + dn})");
-                return (series[0]-d0,series[series.Count - 1] + dn);
+                var p = series[0] - d0;
+                var n = series[series.Count - 1] + dn;
+                Console.WriteLine($"\tAnswer ({p},{n})");
+                return (p,n);
             }
         }
 
