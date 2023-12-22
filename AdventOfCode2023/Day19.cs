@@ -267,83 +267,140 @@ namespace AdventOfCode2023
                 }
             }
             Console.WriteLine($"{results.Count} possible ranges");
-            results.Sort((pr1, pr2) =>
+            
+
+
+            var rejected = new List<partRange> { new partRange() {currentWorkflow="R" } };
+            foreach (var pr in results)
             {
-                int res = pr2.minx - pr1.minx;
-                if(res==0)
-                {
-                    res = pr2.minm - pr1.minm;
-                }
-                if (res == 0)
-                {
-                    res = pr2.mina - pr1.mina;
-                }
-                if (res == 0)
-                {
-                    res = pr2.mins - pr1.mins;
-                }
-                return res;
-            });
-
-            //var merged = new HashSet<partRange>();
-            //for(int i = 0; i < results.Count-1; i++)
-            //{
-            //    for(int j = i; j < results.Count; j++)
-            //    {
-            //        var (pr1, pr2) = MergeRanges(results[i], results[j]);
-            //        merged.Add(pr1);
-            //        if (pr2 != null) merged.Add(pr2);
-            //    }
-            //}
-
-            //for(int x = 1; x <= 4000;x++)
-            //{
-            //    var xranges = merged.Where(r => x >= r.minx && x <= r.maxx).ToList();
-            //    for (int m = 1; m <= 4000; m++)
-            //    {
-            //        var mranges = xranges.Where(r => m >= r.minm && m <= r.maxm).ToList();
-            //        for (int a = 1; a <= 4000; a++)
-            //        {
-            //            var aranges = mranges.Where(r => a >= r.mina && a <= r.maxa).ToList();
-            //            for (int s = 1; s <= 4000; s++)
-            //            {
-            //                if(aranges.Any(r=> s>= r.mins && s<= r.maxs))
-            //                {
-            //                    total2++;
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
-
-            total2 = results.Sum(r => r.GetSum());
+                rejected = SubstractRange(rejected, pr);
+            }
+            var totalRejected = rejected.Sum(r => r.GetSum());
+            total2 = (4000l * 4000 * 4000 *4000)-totalRejected;
 
             Console.WriteLine($"Final result for 2nd star is : {total2}");
             Console.WriteLine($"**************************** END OF DAY 19 ***********************************\r\n");
             Thread.Sleep(1000);
         }
 
-        private (partRange pr1, partRange? pr2) MergeRanges(partRange partRange1, partRange partRange2)
+        private List<partRange> SubstractRange(List<partRange> rejected, partRange pr)
         {
-            if(partRange1.maxx >= partRange2.minx
-            && partRange1.maxm >= partRange2.minm
-            && partRange1.maxa >= partRange2.mina
-            && partRange1.maxs >= partRange2.mins
-                )
+            var result=new List<partRange>(); 
+            foreach(var a in rejected)
             {
-                return (new partRange { 
-                    minx = Math.Min(partRange1.minx,partRange2.minx),
-                    minm = Math.Min(partRange1.minm,partRange2.minm),
-                    mina = Math.Min(partRange1.mina,partRange2.mina),
-                    mins = Math.Min(partRange1.mins,partRange2.mins),
-                    maxx = Math.Max(partRange1.maxx,partRange2.maxx),
-                    maxm = Math.Max(partRange1.maxm,partRange2.maxm),
-                    maxa = Math.Max(partRange1.maxa,partRange2.maxa),
-                    maxs = Math.Max(partRange1.maxs,partRange2.maxs),
-                }, null);
+                var r = SubstractRange(a, pr);
+                if(r != null) result.AddRange(r);
             }
-            return (partRange1, partRange2);
+            return result;
         }
+        private List<partRange> SubstractRange(partRange x, partRange pr)
+        {
+            var resultx = new List<partRange>();
+            if (x.minx < pr.minx)
+            {
+                //First interval "before"
+                var before = x.Clone();
+                before.minx = x.minx;
+                before.maxx = Math.Min(x.maxx, pr.minx);
+                if (before.IsValid()) resultx.Add(before);
+            }
+            //Second interval "middle"
+            var middle = x.Clone();
+            middle.currentWorkflow = pr.currentWorkflow;
+            middle.minx = Math.Min(x.maxx, pr.minx);
+            middle.maxx = Math.Max(x.minx, pr.maxx);
+            if(middle.IsValid()) resultx.Add(middle);
+
+            if (x.maxx > pr.maxx)
+            {
+                //Third interval "after"
+                var after = x.Clone();
+                after.minx = pr.maxx;
+                after.maxx = x.maxx;
+                if (after.IsValid()) resultx.Add(after);
+            }
+            var resultm = new List<partRange>();
+            foreach (var m in resultx)
+            {
+                if (m.minm < pr.minm)
+                {
+                    //First interval "before"
+                    var before = m.Clone();
+                    before.currentWorkflow = x.currentWorkflow;
+                    before.minm = m.minm;
+                    before.maxm = Math.Min(m.maxm,pr.minm);
+                    if (before.IsValid()) resultm.Add(before);
+                }
+                if (m.maxm > pr.maxm)
+                {
+                    //Third interval "after"
+                    var after = m.Clone();
+                    after.currentWorkflow = x.currentWorkflow;
+                    after.minm = pr.maxm;
+                    after.maxm = m.maxm;
+                    if (after.IsValid()) resultm.Add(after);
+                }
+                //Just update the range for middle
+                m.minm = Math.Min(m.maxm, pr.minm);
+                m.maxm = Math.Max(m.minm, pr.maxm);
+                if (m.IsValid()) resultm.Add(m);
+            }
+            var resulta = new List<partRange>();
+            foreach (var a in resultm)
+            {
+                if (a.mina < pr.mina)
+                {
+                    //First interval "before"
+                    var before = a.Clone();
+                    before.currentWorkflow = x.currentWorkflow;
+                    before.mina = a.mina;
+                    before.maxa = Math.Min(a.maxa, pr.mina);
+                    if (before.IsValid()) resulta.Add(before);
+                }
+                if (a.maxa > pr.maxa)
+                {
+                    //Third interval "after"
+                    var after = a.Clone();
+                    after.currentWorkflow = x.currentWorkflow;
+                    after.mina = pr.maxa;
+                    after.maxa = a.maxa;
+                    if (after.IsValid()) resulta.Add(after);
+                }
+                //Just update the range for middle
+                a.mina = Math.Min(a.maxa, pr.mina);
+                a.maxa = Math.Max(a.mina, pr.maxa);
+                if (a.IsValid()) resulta.Add(a);
+            }
+            var results = new List<partRange>();
+            foreach (var s in resulta)
+            {
+                if (s.mins < pr.mins)
+                {
+                    //First interval "before"
+                    var before = s.Clone();
+                    before.currentWorkflow = x.currentWorkflow;
+                    before.mins = s.mins;
+                    before.maxs = Math.Min(s.maxs, pr.mins);
+                    if (before.IsValid()) results.Add(before);
+                }
+                if (s.maxs > pr.maxs)
+                {
+                    //Third interval "after"
+                    var after = s.Clone();
+                    after.currentWorkflow = x.currentWorkflow;
+                    after.mins = pr.maxs;
+                    after.maxs = s.maxs;
+                    if (after.IsValid()) results.Add(after);
+                }
+                //Just update the range for middle
+                s.mins = Math.Min(s.maxs, pr.mins);
+                s.maxs = Math.Max(s.mins, pr.maxs);
+                if (s.IsValid()) results.Add(s);
+            }
+            results.RemoveAll(p => p.currentWorkflow==pr.currentWorkflow);
+            return results;
+        }
+
 
         private workflow ParseWorkflow(string line)
         {
