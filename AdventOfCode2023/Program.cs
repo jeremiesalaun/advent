@@ -21,7 +21,7 @@
             //new Day15().Run();
             //new Day16().Run();
             //new Day17().Run(); **
-            //new Day18().Run(); *
+            new Day18().Run();
             //new Day19().Run();
             //new Day20().Run();
             //new Day21().Run(); *
