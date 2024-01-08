@@ -41,6 +41,8 @@
     <None Remove="Inputs\day23sample.txt" />
     <None Remove="Inputs\day24.txt" />
     <None Remove="Inputs\day24sample.txt" />
+    <None Remove="Inputs\day25.txt" />
+    <None Remove="Inputs\day25sample.txt" />
     <None Remove="Inputs\day3.txt" />
     <None Remove="Inputs\day4.txt" />
     <None Remove="Inputs\day5.txt" />
@@ -125,6 +127,12 @@
     <Content Include="Inputs\day24.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Inputs\day25sample.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Inputs\day25.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Inputs\day3.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -152,6 +160,10 @@
     <Content Include="names.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Rubjerg.Graphviz" Version="2.0.0" />
   </ItemGroup>
 
 </Project>

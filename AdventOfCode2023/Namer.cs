@@ -30,7 +30,13 @@ namespace AdventOfCode2023
             string r="";
             if(i/letters.Length > 0)
             {
-                r += letters[(i / letters.Length) - 1];
+                var j = i / letters.Length;
+                if(j / letters.Length > 0)
+                {
+                    r += letters[(j / letters.Length) - 1];
+                    i = i % letters.Length;
+                }
+                r += letters[(j % letters.Length)];
             }
             r += letters[(i % letters.Length)];
             current++;

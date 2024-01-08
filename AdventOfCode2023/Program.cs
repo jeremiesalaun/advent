@@ -26,8 +26,9 @@
             //new Day20().Run();
             //new Day21().Run(); *
             //new Day22().Run();
-            new Day23().Run(); //*
+            //new Day23().Run();
             //new Day24().Run(); *
+            new Day25().Run();
             //await Scoreboard.Show();
         }
     }
