@@ -8,6 +8,7 @@ using System.Diagnostics.SymbolStore;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Numerics;
 using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
@@ -39,31 +40,21 @@ namespace AdventOfCode2023
                 return "R";
             }
 
-            internal partRange? AdjustRange(partRange pr)
+            internal partRange? AdjustRange(partRange pr,int ruleIndex)
             {
-                //All the rules before the target must be false
-                //Target rule must be true.
+                //All the rules before the target must fail
                 var result = pr.Clone();
-                foreach (var r in rules)
+                for(int i = 0; i < ruleIndex; i++)
                 {
-                    if (pr.currentWorkflow == r.next)
-                    {
-                        r.ApplyRule(result,false);
-                        if (result.IsValid())
-                        {
-                            result.currentWorkflow = this.name;
-                            return result;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        r.ApplyRule(result, true);
-                        if (!result.IsValid()) break;
-                    }
+                    rules[i].ApplyRule(result, true);
+                    if (!result.IsValid()) break;
+                }
+                //Target rule must succeed.
+                rules[ruleIndex].ApplyRule(result, false);
+                if (result.IsValid())
+                {
+                    result.currentWorkflow = this.name;
+                    return result;
                 }
                 return null;
             }
@@ -96,17 +87,17 @@ namespace AdventOfCode2023
                 return false;
             }
 
-            internal void ApplyRule(partRange pr,bool mustFail)
+            internal void ApplyRule(partRange pr, bool mustFail)
             {
                 if (prop == null)//Catch-all rule : always good
                 {
-                    if(mustFail) pr.maxx = 0; //Make the rule invalid
-                    return; 
+                    if (mustFail) pr.maxx = 0; //Make the rule invalid
+                    return;
                 }
                 int min = 0, max = 4000;
                 switch (op)
                 {
-                    case "<": if (mustFail) { min = value; } else { max = value - 1; }  break;
+                    case "<": if (mustFail) { min = value; } else { max = value - 1; } break;
                     case ">": if (mustFail) { max = value; } else { min = value + 1; } break;
                 }
                 switch (prop)
@@ -152,14 +143,9 @@ namespace AdventOfCode2023
                 return maxx > minx && maxm > minm && maxa > mina && maxs > mins;
             }
 
-            public override int GetHashCode()
-            {
-                return $"{currentWorkflow}{minx}{maxx}{minm}{maxm}{mina}{maxa}{mins}{maxs}".GetHashCode();
-            }
-
             internal long GetSum()
             {
-                return (long)(maxx - minx) * (maxm - minm) * (maxa - mina) * (maxs - mins);
+                return (long)(maxx - minx +1) * (maxm - minm + 1) * (maxa - mina + 1) * (maxs - mins + 1);
             }
         }
 
@@ -202,6 +188,42 @@ namespace AdventOfCode2023
                 }
             }
 
+            //Simplify workflows : 
+            //Get all single rule wfs and replace them in all other workflows
+            while (workflows.Values.Any(wf => wf.rules.Select(r => r.next).Distinct().Count() == 1))
+            {
+                foreach (var wf in workflows.Values.Where(wf => wf.rules.Select(r => r.next).Distinct().Count() == 1))
+                {
+                    var n = wf.rules.First().next;
+                    wf.rules.Clear();
+                    wf.rules.Add(new rule() { next = n });
+                }
+                var singleWfs = workflows.Values.Where(wf => wf.rules.Count == 1).ToList();
+                foreach (var swf in singleWfs)
+                {
+                    var n = swf.rules.First().next;
+                    foreach (var wf in workflows.Values)
+                    {
+                        foreach (var r in wf.rules)
+                        {
+                            if (r.next == swf.name) r.next = n;
+                        }
+                    }
+                    workflows.Remove(swf.name);
+                }
+            }
+            //Eliminate redundant rules (rules before the discard rule that have the same result)
+            foreach (var w in workflows.Values)
+            {
+                var discard = w.rules.Last().next;
+                for (var i = w.rules.Count - 2; i >= 0; i--)
+                {
+                    if (w.rules[i].next != discard) break;
+                    w.rules.RemoveAt(i);
+                }
+            }
+
+
             long total1 = 0;
             while (sortedparts.Any(kvp => kvp.Key != "A" && kvp.Key != "R" && kvp.Value.Count > 0))
             {
@@ -225,182 +247,62 @@ namespace AdventOfCode2023
 
             long total2 = 0;
 
-            //Find all the precedents of A
-            var antecedents = new Dictionary<string, List<workflow>>();
-            antecedents.Add("in", new List<workflow>());
+            //Compute a list of antecedents for all workflows, then process back the rules that goes up to A.
+            var antecedents = new Dictionary<string, List<(workflow wf,int ruleIndex)>>();
+            antecedents.Add("in", new List<(workflow,int)>());
             foreach (var wf in workflows.Values)
             {
-                var nexts = wf.rules.Select(r => r.next).ToList();
-                foreach (var next in nexts)
+                for(int ruleindex=0;ruleindex<wf.rules.Count;ruleindex++)
                 {
+                    var next = wf.rules[ruleindex].next;
                     if (antecedents.ContainsKey(next))
                     {
-                        antecedents[next].Add(wf);
+                        antecedents[next].Add((wf,ruleindex));
                     }
                     else
                     {
-                        antecedents[next] = new List<workflow> { wf };
+                        antecedents[next] = new List<(workflow,int)> { (wf,ruleindex) };
                     }
                 }
             }
-            var possiblesRanges = new Queue<partRange>();
             var results = new List<partRange>();
-            foreach (var w in antecedents["A"])
-            {
-                possiblesRanges.Enqueue(new partRange() { currentWorkflow = "A" });
-            }
+            var possiblesRanges = new Queue<partRange>();
+            possiblesRanges.Enqueue(new partRange() { currentWorkflow = "A" });
             while (possiblesRanges.Count > 0)
             {
                 var pr = possiblesRanges.Dequeue();
-                var wfs = antecedents[pr.currentWorkflow];
-                foreach (var w in wfs)
+                if (antecedents.ContainsKey(pr.currentWorkflow))
                 {
-                    partRange? nextPr = w.AdjustRange(pr);
-                    if (nextPr != null)
+                    var wfs = antecedents[pr.currentWorkflow];
+                    foreach (var w in wfs)
                     {
-                        if (nextPr.currentWorkflow == "in")
+                        partRange? nextPr = w.wf.AdjustRange(pr,w.ruleIndex);
+                        if (nextPr != null)
                         {
-                            results.Add(nextPr);
+                            if (nextPr.currentWorkflow == "in")
+                            {
+                                results.Add(nextPr);
+                            }
+                            else
+                            {
+                                possiblesRanges.Enqueue(nextPr);
+                            }
                         }
-                        possiblesRanges.Enqueue(nextPr);
                     }
                 }
             }
-            Console.WriteLine($"{results.Count} possible ranges");
-            
-
-
-            var rejected = new List<partRange> { new partRange() {currentWorkflow="R" } };
-            foreach (var pr in results)
+            Console.WriteLine($"{results.Count} possible ranges : ");
+            foreach (var r in results.OrderBy(r => r.minx).ThenBy(r => r.maxx).ThenBy(r => r.minm).ThenBy(r => r.maxm).ThenBy(r => r.mina).ThenBy(r => r.maxa).ThenBy(r => r.mins).ThenBy(r => r.maxs))
             {
-                rejected = SubstractRange(rejected, pr);
+                Console.WriteLine($"{{[{r.minx},{r.maxx}],[{r.minm},{r.maxm}],[{r.mina},{r.maxa}],[{r.mins},{r.maxs}]}}");
+                total2 += r.GetSum();
             }
-            var totalRejected = rejected.Sum(r => r.GetSum());
-            total2 = (4000l * 4000 * 4000 *4000)-totalRejected;
+
 
             Console.WriteLine($"Final result for 2nd star is : {total2}");
             Console.WriteLine($"**************************** END OF DAY 19 ***********************************\r\n");
             Thread.Sleep(1000);
         }
-
-        private List<partRange> SubstractRange(List<partRange> rejected, partRange pr)
-        {
-            var result=new List<partRange>(); 
-            foreach(var a in rejected)
-            {
-                var r = SubstractRange(a, pr);
-                if(r != null) result.AddRange(r);
-            }
-            return result;
-        }
-        private List<partRange> SubstractRange(partRange x, partRange pr)
-        {
-            var resultx = new List<partRange>();
-            if (x.minx < pr.minx)
-            {
-                //First interval "before"
-                var before = x.Clone();
-                before.minx = x.minx;
-                before.maxx = Math.Min(x.maxx, pr.minx);
-                if (before.IsValid()) resultx.Add(before);
-            }
-            //Second interval "middle"
-            var middle = x.Clone();
-            middle.currentWorkflow = pr.currentWorkflow;
-            middle.minx = Math.Min(x.maxx, pr.minx);
-            middle.maxx = Math.Max(x.minx, pr.maxx);
-            if(middle.IsValid()) resultx.Add(middle);
-
-            if (x.maxx > pr.maxx)
-            {
-                //Third interval "after"
-                var after = x.Clone();
-                after.minx = pr.maxx;
-                after.maxx = x.maxx;
-                if (after.IsValid()) resultx.Add(after);
-            }
-            var resultm = new List<partRange>();
-            foreach (var m in resultx)
-            {
-                if (m.minm < pr.minm)
-                {
-                    //First interval "before"
-                    var before = m.Clone();
-                    before.currentWorkflow = x.currentWorkflow;
-                    before.minm = m.minm;
-                    before.maxm = Math.Min(m.maxm,pr.minm);
-                    if (before.IsValid()) resultm.Add(before);
-                }
-                if (m.maxm > pr.maxm)
-                {
-                    //Third interval "after"
-                    var after = m.Clone();
-                    after.currentWorkflow = x.currentWorkflow;
-                    after.minm = pr.maxm;
-                    after.maxm = m.maxm;
-                    if (after.IsValid()) resultm.Add(after);
-                }
-                //Just update the range for middle
-                m.minm = Math.Min(m.maxm, pr.minm);
-                m.maxm = Math.Max(m.minm, pr.maxm);
-                if (m.IsValid()) resultm.Add(m);
-            }
-            var resulta = new List<partRange>();
-            foreach (var a in resultm)
-            {
-                if (a.mina < pr.mina)
-                {
-                    //First interval "before"
-                    var before = a.Clone();
-                    before.currentWorkflow = x.currentWorkflow;
-                    before.mina = a.mina;
-                    before.maxa = Math.Min(a.maxa, pr.mina);
-                    if (before.IsValid()) resulta.Add(before);
-                }
-                if (a.maxa > pr.maxa)
-                {
-                    //Third interval "after"
-                    var after = a.Clone();
-                    after.currentWorkflow = x.currentWorkflow;
-                    after.mina = pr.maxa;
-                    after.maxa = a.maxa;
-                    if (after.IsValid()) resulta.Add(after);
-                }
-                //Just update the range for middle
-                a.mina = Math.Min(a.maxa, pr.mina);
-                a.maxa = Math.Max(a.mina, pr.maxa);
-                if (a.IsValid()) resulta.Add(a);
-            }
-            var results = new List<partRange>();
-            foreach (var s in resulta)
-            {
-                if (s.mins < pr.mins)
-                {
-                    //First interval "before"
-                    var before = s.Clone();
-                    before.currentWorkflow = x.currentWorkflow;
-                    before.mins = s.mins;
-                    before.maxs = Math.Min(s.maxs, pr.mins);
-                    if (before.IsValid()) results.Add(before);
-                }
-                if (s.maxs > pr.maxs)
-                {
-                    //Third interval "after"
-                    var after = s.Clone();
-                    after.currentWorkflow = x.currentWorkflow;
-                    after.mins = pr.maxs;
-                    after.maxs = s.maxs;
-                    if (after.IsValid()) results.Add(after);
-                }
-                //Just update the range for middle
-                s.mins = Math.Min(s.maxs, pr.mins);
-                s.maxs = Math.Max(s.mins, pr.maxs);
-                if (s.IsValid()) results.Add(s);
-            }
-            results.RemoveAll(p => p.currentWorkflow==pr.currentWorkflow);
-            return results;
-        }
-
 
         private workflow ParseWorkflow(string line)
         {
