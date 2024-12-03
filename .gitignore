@@ -12,3 +12,4 @@ logs/
 *.user
 /packages
 /AdventOfCode2023/Inputs/
+/AdventOfCode2024/Inputs/

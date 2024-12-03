@@ -1,0 +1,74 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <BaseOutputPath></BaseOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="allIwant.txt" />
+    <None Remove="Inputs\day1.txt" />
+    <None Remove="Inputs\day10.txt" />
+    <None Remove="Inputs\day11.txt" />
+    <None Remove="Inputs\day12.txt" />
+    <None Remove="Inputs\day12sample.txt" />
+    <None Remove="Inputs\day13.txt" />
+    <None Remove="Inputs\day14.txt" />
+    <None Remove="Inputs\day15.txt" />
+    <None Remove="Inputs\day16.txt" />
+    <None Remove="Inputs\day17.txt" />
+    <None Remove="Inputs\day17sample.txt" />
+    <None Remove="Inputs\day18.txt" />
+    <None Remove="Inputs\day18sample.txt" />
+    <None Remove="Inputs\day19.txt" />
+    <None Remove="Inputs\day19sample.txt" />
+    <None Remove="Inputs\day20.txt" />
+    <None Remove="Inputs\day21.txt" />
+    <None Remove="Inputs\day21sample.txt" />
+    <None Remove="Inputs\day22.txt" />
+    <None Remove="Inputs\day23.txt" />
+    <None Remove="Inputs\day23sample.txt" />
+    <None Remove="Inputs\day24.txt" />
+    <None Remove="Inputs\day24sample.txt" />
+    <None Remove="Inputs\day25.txt" />
+    <None Remove="Inputs\day25sample.txt" />
+    <None Remove="Inputs\day4.txt" />
+    <None Remove="Inputs\day5.txt" />
+    <None Remove="Inputs\day6.txt" />
+    <None Remove="Inputs\day7.txt" />
+    <None Remove="Inputs\day8.txt" />
+    <None Remove="Inputs\day9.txt" />
+    <None Remove="Inputs\scoreboard.json" />
+    <None Remove="names.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Helpers\allIwant.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Helpers\names.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Inputs\day3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Inputs\day2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Inputs\day1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>
