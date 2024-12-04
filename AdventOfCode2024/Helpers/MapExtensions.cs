@@ -9,6 +9,39 @@ using System.Threading.Tasks;
 
 namespace AdventOfCode2024.Helpers
 {
+    internal static class MapHelper
+    {
+        public static char[,] LoadCharMap(string path)
+        {
+            var lines = File.ReadAllLines(path);
+            var map = new char[lines.Length, lines[0].Length];
+            for (int i = 0; i < lines.Length; i++)
+            {
+                for (int j = 0; j < lines[i].Length; j++)
+                {
+                    map[i, j] = lines[i][j];
+                }
+            }
+            return map;
+        }
+
+        public static int[,] LoadIntMap(string path)
+        {
+            var lines = File.ReadAllLines(path);
+            var map = new int[lines.Length, lines[0].Length];
+            for (int i = 0; i < lines.Length; i++)
+            {
+                var r = lines[i];
+                for (int j = 0; j < lines[i].Length; j++)
+                {
+
+                    map[i, j] = int.Parse(new string(r[j],1));
+                }
+            }
+            return map;
+        }
+    }
+
     internal static class MapExtensions
     {
         public static void ForEachIndex<T>(this T[,] map, Action<Point> action)
@@ -62,6 +95,16 @@ namespace AdventOfCode2024.Helpers
         public static IEnumerable<T> AsEnumerable<T>(this T[,] map)
         {
             return new EnumerableWrapper<T>(map);
+        }
+
+        public static bool IsOutOfBound<T>(this T[,] map, Point p, int offset = 0)
+        {
+            return map.IsOutOfBound(p.X, p.Y,offset);
+        }
+
+        public static bool IsOutOfBound<T>(this T[,] map,int i, int j,int offset=0) {
+            if (i < 0+offset || j < 0 + offset || i >= map.GetLength(0)-offset || j >= map.GetLength(1)-offset) return true;
+            return false;
         }
     }
 

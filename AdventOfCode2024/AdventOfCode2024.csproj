@@ -43,7 +43,6 @@
     <None Remove="Inputs\day24sample.txt" />
     <None Remove="Inputs\day25.txt" />
     <None Remove="Inputs\day25sample.txt" />
-    <None Remove="Inputs\day4.txt" />
     <None Remove="Inputs\day5.txt" />
     <None Remove="Inputs\day6.txt" />
     <None Remove="Inputs\day7.txt" />
@@ -58,6 +57,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Helpers\names.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Inputs\day4.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Inputs\day3.txt">
