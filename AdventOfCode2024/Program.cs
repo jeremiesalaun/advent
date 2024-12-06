@@ -9,7 +9,8 @@
             //new Day3().Run();
             //new Day4().Run();
             //new Day5().Run();
-            new Day6().Run();
+            //new Day6().Run();
+            new Day7().Run();
             //await Scoreboard.Show();
         }
     }

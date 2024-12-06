@@ -1,12 +1,5 @@
 ﻿using AdventOfCode2024.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace AdventOfCode2024
 {
@@ -34,7 +27,7 @@ namespace AdventOfCode2024
             var curDirection = GetDirection(map.Get(start));
             var curPos = start;
             var visited = new HashSet<Point>();
-            var visitedWithDir = new HashSet<(Point,Directions)>();
+            var visitedWithDir = new HashSet<(Point,dirs)>();
             var alreadyTestedPoints  = new HashSet<Point>();
             var possibleBlocks = new HashSet<Point>();
             var allIWant = new AllIWantIsProgress();
@@ -68,8 +61,8 @@ namespace AdventOfCode2024
                     alreadyTestedPoints.Add(testedPos);
                     
                     //Console.Write($"Testing block in {testedPos}");
-                    var testPath = new List<(Point,Directions)>();
-                    var hypVisitedWithDir = new HashSet<(Point,Directions)>(visitedWithDir);
+                    var testPath = new List<(Point,dirs)>();
+                    var hypVisitedWithDir = new HashSet<(Point,dirs)>(visitedWithDir);
                     //var hypMap = map.Clone() as char[,];
                     var hypDir = NavigationHelper.TurnRight(curDirection);
                     var hypLoc = curPos;
@@ -130,27 +123,27 @@ Final result for 2nd star is : {total2}
             Thread.Sleep(1000);
         }
 
-        private char GetPathChar(Directions d)
+        private char GetPathChar(dirs d)
         {
             switch (d)
             {
-                case Directions.north: 
-                case Directions.south: return '|';
-                case Directions.east: 
-                case Directions.west: return '-';
+                case dirs.north: 
+                case dirs.south: return '|';
+                case dirs.east: 
+                case dirs.west: return '-';
                 default: return 'o';
             }
         }
 
-        private Directions GetDirection(char c)
+        private dirs GetDirection(char c)
         {
             switch (c)
             {
-                case '>': return Directions.east;
-                case '<': return Directions.west;
-                case 'v': return Directions.south;
-                case '^': return Directions.north;
-                default: return Directions.north;
+                case '>': return dirs.east;
+                case '<': return dirs.west;
+                case 'v': return dirs.south;
+                case '^': return dirs.north;
+                default: return dirs.north;
             }
         }
 

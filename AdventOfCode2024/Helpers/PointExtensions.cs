@@ -1,50 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 
 namespace AdventOfCode2024.Helpers
 {
-    public enum Directions { none,north, south, west, east }
+    public enum dirs { none, north, south, west, east }
     internal static class NavigationHelper
     {
-        public static Directions TurnRight(Directions d)
+        public static dirs TurnRight(dirs d)
         {
             switch (d)
             {
-                case Directions.north: return Directions.east;
-                case Directions.south: return Directions.west;
-                case Directions.east: return Directions.south;
-                case Directions.west: return Directions.north;
-                default: return Directions.none;
+                case dirs.north: return dirs.east;
+                case dirs.south: return dirs.west;
+                case dirs.east: return dirs.south;
+                case dirs.west: return dirs.north;
+                default: return dirs.none;
             }
         }
 
-        public static Directions TurnLeft(Directions d)
+        public static dirs TurnLeft(dirs d)
         {
             switch (d)
             {
-                case Directions.north: return Directions.west;
-                case Directions.south: return Directions.east;
-                case Directions.east: return Directions.north;
-                case Directions.west: return Directions.south;
-                default: return Directions.none;
+                case dirs.north: return dirs.west;
+                case dirs.south: return dirs.east;
+                case dirs.east: return dirs.north;
+                case dirs.west: return dirs.south;
+                default: return dirs.none;
             }
         }
     }
     internal static class PointExtensions
     {
-        public static Point Move(this Point p, Directions d)
+        public static Point Move(this Point p, dirs d)
         {
             Point r;
             switch (d)
             {
-                case Directions.north: r = new Point(p.X - 1, p.Y); break;
-                case Directions.south: r = new Point(p.X + 1, p.Y); break;
-                case Directions.east: r = new Point(p.X, p.Y + 1); break;
-                case Directions.west: r = new Point(p.X, p.Y - 1); break;
+                case dirs.north: r = new Point(p.X - 1, p.Y); break;
+                case dirs.south: r = new Point(p.X + 1, p.Y); break;
+                case dirs.east: r = new Point(p.X, p.Y + 1); break;
+                case dirs.west: r = new Point(p.X, p.Y - 1); break;
                 default: r = p; break;
             }
             return r;
