@@ -44,6 +44,16 @@ namespace AdventOfCode2024.Helpers
 
     internal static class MapExtensions
     {
+        public static T Get<T>(this T[,] map, Point p)
+        {
+            return map[p.X, p.Y];
+        }
+
+        public static void Set<T>(this T[,] map, Point p,T value)
+        {
+            map[p.X, p.Y]=value;
+        }
+
         public static void ForEachIndex<T>(this T[,] map, Action<Point> action)
         {
             for (int i = 0; i < map.GetLength(0); i++)
@@ -105,6 +115,20 @@ namespace AdventOfCode2024.Helpers
         public static bool IsOutOfBound<T>(this T[,] map,int i, int j,int offset=0) {
             if (i < 0+offset || j < 0 + offset || i >= map.GetLength(0)-offset || j >= map.GetLength(1)-offset) return true;
             return false;
+        }
+
+        public static void Print<T>(this T[,] map)
+        {
+            Console.Clear();
+            Console.WriteLine("\x1b[3J");
+            for (int i = 0; i < map.GetLength(0); i++)
+            {
+                for (int j = 0; j < map.GetLength(1); j++)
+                {
+                    Console.Write(map[i, j]);
+                }
+                Console.Write(Environment.NewLine);
+            }
         }
     }
 
