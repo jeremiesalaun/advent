@@ -44,5 +44,14 @@ namespace AdventOfCode2024.Helpers
             }
             return r;
         }
+
+        public static Point Substract(this Point p, Point value)
+        {
+            return new Point(p.X-value.X, p.Y-value.Y);
+        }
+        public static Point Add(this Point p, Point value)
+        {
+            return new Point(p.X + value.X, p.Y + value.Y);
+        }
     }
 }

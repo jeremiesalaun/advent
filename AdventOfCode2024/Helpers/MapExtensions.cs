@@ -96,9 +96,25 @@ namespace AdventOfCode2024.Helpers
             }
         }
 
+        public static IEnumerator<Point> GetPointEnumerator<T>(this T[,] map)
+        {
+            for (int i = 0; i < map.GetLength(0); i++)
+            {
+                for (int j = 0; j < map.GetLength(1); j++)
+                {
+                    yield return new Point(i,j);
+                }
+            }
+        }
+
         public static IEnumerable<T> AsEnumerable<T>(this T[,] map)
         {
             return new EnumerableWrapper<T>(map);
+        }
+
+        public static IEnumerable<Point> AsPointEnumerable<T>(this T[,] map)
+        {
+            return new PointEnumerableWrapper<T>(map);
         }
 
         public static bool IsOutOfBound<T>(this T[,] map, Point p, int offset = 0)
@@ -142,6 +158,25 @@ namespace AdventOfCode2024.Helpers
         IEnumerator IEnumerable.GetEnumerator()
         {
             return _map.GetEnumerator<T>();
+        }
+    }
+
+    public class PointEnumerableWrapper<T> : IEnumerable<Point>
+    {
+        private readonly T[,] _map;
+        public PointEnumerableWrapper(T[,] map)
+        {
+            _map = map;
+        }
+
+        public IEnumerator<Point> GetEnumerator()
+        {
+            return _map.GetPointEnumerator<T>();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _map.GetPointEnumerator<T>();
         }
     }
 }

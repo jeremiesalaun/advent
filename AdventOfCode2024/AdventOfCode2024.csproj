@@ -44,7 +44,6 @@
     <None Remove="Inputs\day25.txt" />
     <None Remove="Inputs\day25sample.txt" />
     <None Remove="Inputs\day6.txt" />
-    <None Remove="Inputs\day8.txt" />
     <None Remove="Inputs\day9.txt" />
     <None Remove="Inputs\scoreboard.json" />
     <None Remove="names.txt" />
@@ -55,6 +54,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Helpers\names.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Inputs\day8.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Inputs\day7.txt">
