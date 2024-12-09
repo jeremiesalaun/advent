@@ -13,14 +13,14 @@ namespace AdventOfCode2024
     //Replace _0_ by day number
     internal class Day_0_
     {
-
+        const bool TEST = true;
         public void Run()
         {
             Console.WriteLine("#################################### WELCOME TO DAY _0_ !! ##################################\r\n");
             long total1 = 0;
             long total2 = 0;
             //Read file
-            var path = @"Inputs\day_0_.txt";
+            var path = $@"{(TEST ? "Samples" : "Inputs")}\day_0_.txt";
 
 
             //Print out total result
