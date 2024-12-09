@@ -5,7 +5,7 @@ namespace AdventOfCode2024
 {
     internal class Day6
     {
-
+        const bool TEST = false;
         private char[,] map;
         public void Run()
         {
@@ -13,7 +13,7 @@ namespace AdventOfCode2024
             long total1 = 0;
             long total2 = 0;
             //Read file
-            var path = @"Inputs\day6.txt";
+            var path = $@"{(TEST ? "Samples" : "Inputs")}\day6.txt";
             map = MapHelper.LoadCharMap(path);
             //Find starting point
             Point start=Point.Empty;

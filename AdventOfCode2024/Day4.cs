@@ -2,8 +2,10 @@
 
 namespace AdventOfCode2024
 {
+    
     internal class Day4
     {
+        const bool TEST = false;
         private char[,] map;
         private char[] xmas = { 'X', 'M', 'A', 'S' };
         public void Run()
@@ -12,7 +14,7 @@ namespace AdventOfCode2024
             long total1 = 0;
             long total2 = 0;
             //Read file
-            map = MapHelper.LoadCharMap(@"Inputs\day4.txt");
+            map = MapHelper.LoadCharMap($@"{(TEST ? "Samples" : "Inputs")}\day4.txt");
             map.ForEachIndex(p =>
             {
                 switch (map[p.X, p.Y])

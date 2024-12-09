@@ -2,13 +2,14 @@
 {
     internal class Day2
     {
+        const bool TEST = false;
         public void Run()
         {
             Console.WriteLine("#################################### WELCOME TO DAY 2 !! ##################################\r\n");
             long total1 = 0;
             long total2 = 0;
             //Read file
-            var path = @"Inputs\day2.txt";
+            var path = $@"{(TEST ? "Samples" : "Inputs")}\day2.txt";
             using (var sr = new StreamReader(path, true))
             {
                 while (!sr.EndOfStream)

@@ -4,13 +4,14 @@ namespace AdventOfCode2024
 {
     internal class Day3
     {
+        const bool TEST = false;
         public void Run()
         {
             Console.WriteLine("#################################### WELCOME TO DAY 3 !! ##################################\r\n");
             long total1 = 0;
             long total2 = 0;
             //Read file
-            var path = @"Inputs\day3.txt";
+            var path = $@"{(TEST ? "Samples" : "Inputs")}\day3.txt";
             using (var sr = new StreamReader(path, true))
             {
                 var enabled = true;

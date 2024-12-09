@@ -4,6 +4,7 @@ namespace AdventOfCode2024
 {
     internal class Day1
     {
+        const bool TEST = false;
         private List<int> left = new List<int>();
         private List<int> right = new List<int>();
         public void Run()
@@ -13,7 +14,7 @@ namespace AdventOfCode2024
             long total2 = 0;
             var re = new Regex(@"(?<left>\d+)\s+(?<right>\d+)");
             //Read file
-            var path = @"Inputs\day1.txt";
+            var path = $@"{(TEST ? "Samples" : "Inputs")}\day1.txt";
             using (var sr = new StreamReader(path, true))
             {
                 while (!sr.EndOfStream)

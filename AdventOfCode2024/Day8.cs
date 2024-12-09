@@ -14,6 +14,7 @@ namespace AdventOfCode2024
 {
     internal class Day8
     {
+        const bool TEST = false;
         private char[,] map;
         private Dictionary<char, List<Point>> locByFreq;
         public void Run()
@@ -22,7 +23,7 @@ namespace AdventOfCode2024
             long total1 = 0;
             long total2 = 0;
             //Read file
-            var path = @"Inputs\day8.txt";
+            var path = $@"{(TEST ? "Samples" : "Inputs")}\day8.txt";
             map = MapHelper.LoadCharMap(path);
             locByFreq = map.AsPointEnumerable()
                             .Where(p => map.Get(p) != '.')

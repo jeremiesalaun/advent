@@ -4,6 +4,7 @@ namespace AdventOfCode2024
 {
     internal class Day5
     {
+        const bool TEST = false;
         private class Rule
         {
             public int Before { get; set; }
@@ -35,7 +36,7 @@ namespace AdventOfCode2024
             long total1 = 0;
             long total2 = 0;
             //Read file
-            var path = @"Inputs\day5.txt";
+            var path = $@"{(TEST ? "Samples" : "Inputs")}\day5.txt";
             using (var sr = new StreamReader(path, true))
             {
                 bool rulesAreDone = false;
