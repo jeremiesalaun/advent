@@ -49,6 +49,11 @@ namespace AdventOfCode2024.Helpers
         {
             return new Point(p.X-value.X, p.Y-value.Y);
         }
+
+        public static Point Mult(this Point p, int multiplicator)
+        {
+            return new Point(p.X * multiplicator, p.Y * multiplicator);
+        }
         public static Point Add(this Point p, Point value)
         {
             return new Point(p.X + value.X, p.Y + value.Y);
