@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Diagnostics.Metrics;
+using System.Drawing;
 
 namespace AdventOfCode2024.Helpers
 {
@@ -48,6 +49,14 @@ namespace AdventOfCode2024.Helpers
         public static Point Substract(this Point p, Point value)
         {
             return new Point(p.X-value.X, p.Y-value.Y);
+        }
+
+        public static Point Modulo(this Point p, Point value)
+        {
+            var q = new Point(p.X % value.X, p.Y % value.Y);
+            if (q.X < 0) q.X = value.X + q.X;
+            if (q.Y < 0) q.Y = value.Y + q.Y;
+            return q;
         }
 
         public static Point Mult(this Point p, int multiplicator)
