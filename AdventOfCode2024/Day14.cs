@@ -22,7 +22,7 @@ namespace AdventOfCode2024
             public void Move()
             {
                 Position = Position.Add(Velocity);
-                Position = Position.Modulo(roomSize);
+                Position = Position.Wrap(roomSize);
             }
         }
 

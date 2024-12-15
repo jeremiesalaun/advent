@@ -51,11 +51,11 @@ namespace AdventOfCode2024.Helpers
             return new Point(p.X-value.X, p.Y-value.Y);
         }
 
-        public static Point Modulo(this Point p, Point value)
+        public static Point Wrap(this Point p, Point bounds)
         {
-            var q = new Point(p.X % value.X, p.Y % value.Y);
-            if (q.X < 0) q.X = value.X + q.X;
-            if (q.Y < 0) q.Y = value.Y + q.Y;
+            var q = new Point(p.X % bounds.X, p.Y % bounds.Y);
+            if (q.X < 0) q.X = bounds.X + q.X;
+            if (q.Y < 0) q.Y = bounds.Y + q.Y;
             return q;
         }
 
