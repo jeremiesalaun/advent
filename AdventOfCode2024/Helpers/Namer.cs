@@ -1,5 +1,30 @@
 ﻿namespace AdventOfCode2024.Helpers
 {
+    internal class IntSequence()
+    {
+        private int current;
+        
+        public void Set(int value)
+        {
+            current = value;
+        }
+
+        public void Reset()
+        {
+            current = 0;
+        }
+
+        public int Next()
+        {
+            current++;
+            return current;
+        }
+
+        public int Peek()
+        {
+            return current+1;
+        }
+    }
     internal class Namer
     {
         private List<string> names;
@@ -8,7 +33,7 @@
         public Namer()
         {
             names = new List<string>(File.ReadAllLines("Helpers/names.txt"));
-            letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+            letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzαβγδεζηθικλμνξοπρστυφψω".ToCharArray();
             current = 0;
         }
 

@@ -29,6 +29,18 @@ namespace AdventOfCode2024.Helpers
                 default: return dirs.none;
             }
         }
+
+        public static dirs Opposite(dirs d)
+        {
+            switch (d)
+            {
+                case dirs.west: return dirs.east;
+                case dirs.north: return dirs.south;
+                case dirs.south: return dirs.north;
+                case dirs.east: return dirs.west;
+            }
+            return dirs.none;
+        }
     }
     internal static class PointExtensions
     {

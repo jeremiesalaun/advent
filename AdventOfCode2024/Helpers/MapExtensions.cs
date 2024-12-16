@@ -127,7 +127,7 @@ namespace AdventOfCode2024.Helpers
             return false;
         }
 
-        public static void Print<T>(this T[,] map)
+        public static void Print<T>(this T[,] map,Predicate<T>? p=null,ConsoleColor color=ConsoleColor.White)
         {
             Console.Clear();
             Console.WriteLine("\x1b[3J");
@@ -135,7 +135,12 @@ namespace AdventOfCode2024.Helpers
             {
                 for (int j = 0; j < map.GetLength(1); j++)
                 {
+                    if(p!=null && p(map[i, j]))
+                    {
+                        Console.ForegroundColor = color;
+                    }
                     Console.Write(map[i, j]);
+                    Console.ResetColor();
                 }
                 Console.Write(Environment.NewLine);
             }
