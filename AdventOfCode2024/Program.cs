@@ -20,7 +20,8 @@
             //new Day14().Run();
             //new Day15().Run();
             //new Day16().Run();
-            new Day17().Run();
+            //new Day17().Run();
+            new Day18().Run();
             //await Scoreboard.Show();
         }
     }

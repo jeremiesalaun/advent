@@ -58,6 +58,11 @@ namespace AdventOfCode2024.Helpers
             return r;
         }
 
+        public static int DistanceTo(this Point p, Point to)
+        {
+            return Math.Abs(p.X - to.X)+ Math.Abs(p.Y - to.Y);
+        }
+
         public static Point Substract(this Point p, Point value)
         {
             return new Point(p.X-value.X, p.Y-value.Y);
