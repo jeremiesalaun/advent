@@ -6,27 +6,28 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace AdventOfCode2024
 {
-    //Replace _0_ by day number
-    internal class Day_0_
+    //Replace 21 by day number
+    internal class Day21
     {
         const bool TEST = true;
         public void Run()
         {
-            Console.WriteLine("#################################### WELCOME TO DAY _0_ !! ##################################\r\n");
+            Console.WriteLine("#################################### WELCOME TO DAY 21 !! ##################################\r\n");
             long total1 = 0;
             long total2 = 0;
             //Read file
-            var path = $@"{(TEST ? "Samples" : "Inputs")}\day_0_.txt";
+            var path = $@"{(TEST ? "Samples" : "Inputs")}\day21.txt";
 
 
             //Print out total result
             Console.WriteLine(
 $@"Final result for 1st star is : {total1}
 Final result for 2nd star is : {total2}
-**************************** END OF DAY _0_ ***********************************");
+**************************** END OF DAY 21 ***********************************");
             Thread.Sleep(1000);
         }
 
