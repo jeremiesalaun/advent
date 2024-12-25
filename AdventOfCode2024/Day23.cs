@@ -106,10 +106,10 @@ namespace AdventOfCode2024
                 }
             }
             Console.WriteLine($"Found {triplets.Count} triplets");
-            foreach (var t in triplets.OrderBy(t => t.ToString()))
-            {
-                Console.WriteLine($"{t.n1.Name},{t.n2.Name},{t.n3.Name}");
-            }
+            //foreach (var t in triplets.OrderBy(t => t.ToString()))
+            //{
+            //    Console.WriteLine($"{t.n1.Name},{t.n2.Name},{t.n3.Name}");
+            //}
             total1 = triplets.Where((Triplet x) => x.n1.Name.StartsWith('t')
                                                 || x.n2.Name.StartsWith('t')
                                                 || x.n3.Name.StartsWith('t'))

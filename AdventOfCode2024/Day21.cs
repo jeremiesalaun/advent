@@ -9,12 +9,10 @@ namespace AdventOfCode2024
     internal class Day21
     {
 
-        private char[,] nPadMap;
-        private char[,] dPadMap;
+        private Point NNO = new Point(3, 0);
+        private Point DNO = new Point(0, 0);
         private List<string> codes;
-        private Dictionary<(Point, Point), string> CacheBest3 = new Dictionary<(Point, Point), string>();
-        private Dictionary<(char, char), string> CacheBest5D = new Dictionary<(char, char), string>();
-
+        private Dictionary<(string seq, int depth), long> dicMinLengthCache = new Dictionary<(string seq, int depth), long>();
         const bool TEST = false;
         public void Run()
         {
@@ -25,72 +23,9 @@ namespace AdventOfCode2024
             var path = $@"{(TEST ? "Samples" : "Inputs")}\day21.txt";
             codes = File.ReadAllLines(path).ToList();
 
-            InitDPadMap();
-            InitNPadMap();
-
-
-            for (int i = 0; i < 4; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    for (int k = 0; k < 4; k++)
-                    {
-                        for (int l = 0; l < 3; l++)
-                        {
-                            if (!(i == 3 && j == 0) && !(k == 3 && l == 0))
-                            {
-                                CacheBest3[(new Point(i, j), new Point(k, l))] = FindBest3(new Point(i, j), new Point(k, l));
-                            }
-                        }
-                    }
-                }
-            }
-
-            foreach (var code in codes)
-            {
-                var initPos = GetCharPosN('A');
-                string res = "";
-                foreach (var c in code)
-                {
-                    var pos = GetCharPosN(c);
-                    res += CacheBest3[(initPos, pos)];
-                    initPos = pos;
-                }
-
-                //Console.WriteLine(res);
-                total1 += int.Parse(code.Replace("A", "")) * res.Length;
-                Console.WriteLine($"{code} : {res.Length}");
-            }
-
-            Compute(2);
-
+            total1 = Compute(2);
             total2 = Compute(25);
-            //154115708116294
-
-            //foreach (var c1 in new char[] {'<', '^', 'v', '>','A'})
-            //{
-            //    foreach (var c2 in new char[] { '<', '^', 'v', '>', 'A' })
-            //    {
-            //        CacheBest5D[(c1, c2)] = FindBest5D(c1, c2);
-            //    }
-            //}
-
-            //foreach (var code in codes)
-            //{
-            //    var initPos = GetCharPosN('A');
-            //    string res = "";
-            //    foreach (var c in code)
-            //    {
-            //        var pos = GetCharPosN(c);
-            //        res += FindBest25(initPos, pos);
-            //        initPos = pos;
-            //    }
-
-            //    Console.WriteLine(res);
-            //    total2 += int.Parse(code.Replace("A", "")) * res.Length;
-            //    Console.WriteLine($"{code} : {res.Length}");
-            //}
-
+            
             //Print out total result
             Console.WriteLine(
 $@"Final result for 1st star is : {total1}
@@ -127,8 +62,6 @@ Final result for 2nd star is : {total2}
             return res;
         }
 
-        private Dictionary<(string seq, int depth), long> dicMinLengthCache = new Dictionary<(string seq, int depth), long>();
-
         private long FindMinLength(List<char> list,int depth)
         {
             var seq = new string(list.ToArray());
@@ -137,7 +70,7 @@ Final result for 2nd star is : {total2}
                 return dicMinLengthCache[(seq, depth)];
             }
             //Trouver les possibilités pour la séquence à ce niveau.
-            var subSequences = Recurs(new List<char>(), list, 0);
+            var subSequences = Transcribe(new List<char>(), list, 0);
             //Si on est au niveau 1, renvoyer la plus courte des 2 séquences
             if (depth == 1)
             {
@@ -176,34 +109,6 @@ Final result for 2nd star is : {total2}
             return GetPossibleSequences(prevPosition, nextPosition, NNO);
         }
 
-        private Point NNO = new Point(3, 0);
-        private Point DNO = new Point(0, 0);
-        private string FindBest3(Point prevPosition, Point nextPosition)
-        {
-            //Console.WriteLine($"Move of {nPadMap.Get(prevPosition)} to {nPadMap.Get(nextPosition)} ({nextPosition.Substract(prevPosition)}) :");
-            var outputs = new List<List<char>>();
-            var (l1, l2) = GetPossibleSequences(prevPosition, nextPosition, NNO);
-            outputs.Add(l1);
-            if (l2 != null) outputs.Add(l2);
-
-            var outputs2 = new List<List<char>>();
-            foreach (var l in outputs)
-            {
-                outputs2.AddRange(Recurs(new List<char>(), l, 0));
-            }
-
-            var outputs3 = new List<List<char>>();
-            foreach (var l in outputs2)
-            {
-                outputs3.AddRange(Recurs(new List<char>(), l, 0));
-            }
-
-            //foreach (var s in outputs3.Select(l => new string(l.ToArray())).Distinct().OrderBy(s => s.Length))
-            //{
-            //    Console.WriteLine($"\t{new String(s.ToArray())}");
-            //}
-            return outputs3.OrderBy(s => s.Count).Take(1).Select(l => new string(l.ToArray())).First();
-        }
 
         private static (List<char> l1, List<char>? l2) GetPossibleSequences(Point prevPosition, Point nextPosition, Point no)
         {
@@ -240,8 +145,7 @@ Final result for 2nd star is : {total2}
             }
         }
 
-
-        private List<List<char>> Recurs(List<char> current, List<char> input, int position)
+        private List<List<char>> Transcribe(List<char> current, List<char> input, int position)
         {
             if (position == input.Count)
             {
@@ -255,20 +159,11 @@ Final result for 2nd star is : {total2}
             {
                 var l = new List<char>(current);
                 l.AddRange(l2);
-                res.AddRange(Recurs(l, input, position + 1));
+                res.AddRange(Transcribe(l, input, position + 1));
             }
             current.AddRange(l1);
-            res.AddRange(Recurs(current, input, position + 1));
+            res.AddRange(Transcribe(current, input, position + 1));
             return res;
-        }
-
-        private void Print(Queue<char> q)
-        {
-            while (q.Count > 0)
-            {
-                Console.Write(q.Dequeue());
-            }
-            Console.WriteLine();
         }
 
         private Dictionary<char,Point> dCharCache =null;
@@ -286,24 +181,25 @@ Final result for 2nd star is : {total2}
             return dCharCache[input];
         }
 
+        private Dictionary<char, Point> dCharNCache = null;
         private Point GetCharPosN(char input)
         {
-            return nPadMap.AsPointEnumerable().First(p => nPadMap.Get(p) == input);
-        }
-        private void InitDPadMap()
-        {
-            dPadMap = new char[2, 3];
-            dPadMap[0, 0] = '#'; dPadMap[0, 1] = '^'; dPadMap[0, 2] = 'A';
-            dPadMap[1, 0] = '<'; dPadMap[1, 1] = 'v'; dPadMap[1, 2] = '>';
-        }
-
-        private void InitNPadMap()
-        {
-            nPadMap = new char[4, 3];
-            nPadMap[0, 0] = '7'; nPadMap[0, 1] = '8'; nPadMap[0, 2] = '9';
-            nPadMap[1, 0] = '4'; nPadMap[1, 1] = '5'; nPadMap[1, 2] = '6';
-            nPadMap[2, 0] = '1'; nPadMap[2, 1] = '2'; nPadMap[2, 2] = '3';
-            nPadMap[3, 0] = '#'; nPadMap[3, 1] = '0'; nPadMap[3, 2] = 'A';
+            if (dCharNCache == null)
+            {
+                dCharNCache = new Dictionary<char, Point>();
+                dCharNCache['7']=new Point(0, 0); 
+                dCharNCache['8']=new Point(0, 1); 
+                dCharNCache['9']=new Point(0, 2);
+                dCharNCache['4']=new Point(1, 0); 
+                dCharNCache['5']=new Point(1, 1); 
+                dCharNCache['6']=new Point(1, 2);
+                dCharNCache['1']=new Point(2, 0); 
+                dCharNCache['2']=new Point(2, 1); 
+                dCharNCache['3']=new Point(2, 2);            
+                dCharNCache['0']=new Point(3, 1);
+                dCharNCache['A']=new Point(3, 2);
+            }
+            return dCharNCache[input];
         }
 
         private static char DirToChar(dirs d)

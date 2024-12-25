@@ -110,7 +110,7 @@ namespace AdventOfCode2024
                     }                    
                 }
             }
-            map.Print();
+            //map.Print();
             total1 = visited.Count;
             total2 = possibleBlocks.Count;
            

@@ -26,7 +26,7 @@ namespace AdventOfCode2024
                     }
                     else
                     {
-                        Console.WriteLine("\tMISSED without concat");
+                        //Console.WriteLine("\tMISSED without concat");
                         x = ProcessLine(line, true);
                         if (x > 0)
                         {
@@ -34,7 +34,7 @@ namespace AdventOfCode2024
                         }
                         else
                         {
-                            Console.WriteLine("\tMISSED");
+                            //Console.WriteLine("\tMISSED");
                         }
                     }
                 }
@@ -54,20 +54,20 @@ Final result for 2nd star is : {total2}
             var colon = line.IndexOf(':');
             var goal = long.Parse(line.Substring(0, colon));
             var values = line.Substring(colon + 2).Split(' ').Select(s => long.Parse(s)).ToList();
-            Console.Write($"Goal is {goal}, values are {string.Join(',', values)} {(useConcat ? "(with concat)" : "")}");
+            //Console.Write($"Goal is {goal}, values are {string.Join(',', values)} {(useConcat ? "(with concat)" : "")}");
 
             //Shortcut : try some direct calculations
             var lowest = GetLowest(values);
             var highest = GetHighest(values,useConcat);
-            Console.Write($"\t result reachable within [{lowest},{highest}]");
+            ///Console.Write($"\t result reachable within [{lowest},{highest}]");
             if (goal < lowest || goal > highest)
             {
-                Console.WriteLine("\t => GOAL OUT OF REACH !!");
+                //Console.WriteLine("\t => GOAL OUT OF REACH !!");
                 return 0;
             }
             if (goal == lowest || goal == highest)
             {
-                Console.WriteLine("\t => DIRECT FIND !!");
+                //Console.WriteLine("\t => DIRECT FIND !!");
                 return goal;
             }
 
@@ -99,7 +99,7 @@ Final result for 2nd star is : {total2}
         {
             if (currentIndex == values.Count)
             {
-                if (currentResult == goal) Console.WriteLine("\t GOAL REACHED !");
+                //if (currentResult == goal) Console.WriteLine("\t GOAL REACHED !");
                 return currentResult == goal;
             }
             var curVal = values[currentIndex];
