@@ -4,7 +4,6 @@ using System.Drawing;
 
 namespace AdventOfCode2024
 {
-    //Replace 20 by day number
     internal class Day20
     {
         private char[,] map;

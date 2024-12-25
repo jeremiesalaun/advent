@@ -1,14 +1,11 @@
 ﻿using AdventOfCode2024.Helpers;
+using System.ComponentModel.Design.Serialization;
 using System.Drawing;
-using System.Net.Http.Headers;
-using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
+using System.Runtime.InteropServices.Marshalling;
 using System.Text;
-using System.Threading.Channels;
 
 namespace AdventOfCode2024
 {
-    //Replace 21 by day number
     internal class Day21
     {
 
@@ -60,35 +57,39 @@ namespace AdventOfCode2024
                     initPos = pos;
                 }
 
-                Console.WriteLine(res);
+                //Console.WriteLine(res);
                 total1 += int.Parse(code.Replace("A", "")) * res.Length;
                 Console.WriteLine($"{code} : {res.Length}");
             }
 
+            Compute(2);
 
-            foreach (var c1 in new char[] {'<', '^', 'v', '>','A'})
-            {
-                foreach (var c2 in new char[] { '<', '^', 'v', '>', 'A' })
-                {
-                    CacheBest5D[(c1, c2)] = FindBest5D(c1, c2);
-                }
-            }
+            total2 = Compute(25);
+            //154115708116294
 
-            foreach (var code in codes)
-            {
-                var initPos = GetCharPosN('A');
-                string res = "";
-                foreach (var c in code)
-                {
-                    var pos = GetCharPosN(c);
-                    res += FindBest25(initPos, pos);
-                    initPos = pos;
-                }
+            //foreach (var c1 in new char[] {'<', '^', 'v', '>','A'})
+            //{
+            //    foreach (var c2 in new char[] { '<', '^', 'v', '>', 'A' })
+            //    {
+            //        CacheBest5D[(c1, c2)] = FindBest5D(c1, c2);
+            //    }
+            //}
 
-                Console.WriteLine(res);
-                total2 += int.Parse(code.Replace("A", "")) * res.Length;
-                Console.WriteLine($"{code} : {res.Length}");
-            }
+            //foreach (var code in codes)
+            //{
+            //    var initPos = GetCharPosN('A');
+            //    string res = "";
+            //    foreach (var c in code)
+            //    {
+            //        var pos = GetCharPosN(c);
+            //        res += FindBest25(initPos, pos);
+            //        initPos = pos;
+            //    }
+
+            //    Console.WriteLine(res);
+            //    total2 += int.Parse(code.Replace("A", "")) * res.Length;
+            //    Console.WriteLine($"{code} : {res.Length}");
+            //}
 
             //Print out total result
             Console.WriteLine(
@@ -98,13 +99,90 @@ Final result for 2nd star is : {total2}
             Thread.Sleep(1000);
         }
 
+        private long Compute(int depth)
+        {
+            dicMinLengthCache.Clear();
+            var res = 0L;
+            foreach (var code in codes)
+            {
+                var prevChar = 'A';
+                var minLength = 0L;
+                foreach (var c in code)
+                {
+                    Console.Write(c);
+                    var (l1, l2) = FindSeqN(prevChar, c);
+                    var x = FindMinLength(l1, depth);
+                    if (l2 != null)
+                    {
+                        var y = FindMinLength(l2, depth);
+                        if (y < x) x = y;
+                    }
+                    minLength += x;
+                    prevChar = c;
+                }
+                Console.WriteLine($" : {minLength}");
+                res += long.Parse(code.Replace("A", "")) * minLength;
+            }
+
+            return res;
+        }
+
+        private Dictionary<(string seq, int depth), long> dicMinLengthCache = new Dictionary<(string seq, int depth), long>();
+
+        private long FindMinLength(List<char> list,int depth)
+        {
+            var seq = new string(list.ToArray());
+            if (dicMinLengthCache.ContainsKey((seq, depth)))
+            {
+                return dicMinLengthCache[(seq, depth)];
+            }
+            //Trouver les possibilités pour la séquence à ce niveau.
+            var subSequences = Recurs(new List<char>(), list, 0);
+            //Si on est au niveau 1, renvoyer la plus courte des 2 séquences
+            if (depth == 1)
+            {
+                var d = subSequences.Min(l => l.Count);
+                dicMinLengthCache[(seq, depth)] = d;
+                return d;
+            }
+            else
+            {
+                //Si on est à  un niveau supérieur, relancer le calcul sur chacune des séquences au niveau suivant.
+                var minD = long.MaxValue;
+                foreach(var l in subSequences)
+                {
+                    var m = new List<char>();
+                    var d = 0L;
+                    foreach(var c in l)
+                    {
+                        m.Add(c);
+                        if (c == 'A')
+                        {
+                            d += FindMinLength(m, depth - 1);
+                            m.Clear();
+                        }
+                    }
+                    minD = Math.Min(minD, d);
+                }
+                dicMinLengthCache[(seq, depth)] = minD;
+                return minD;
+            }
+        }
+
+        private (List<char> l1, List<char>? l2) FindSeqN(char prevChar, char c)
+        {
+            var prevPosition = GetCharPosN(prevChar);
+            var nextPosition = GetCharPosN(c);
+            return GetPossibleSequences(prevPosition, nextPosition, NNO);
+        }
+
         private Point NNO = new Point(3, 0);
         private Point DNO = new Point(0, 0);
         private string FindBest3(Point prevPosition, Point nextPosition)
         {
-            Console.WriteLine($"Move of {nPadMap.Get(prevPosition)} to {nPadMap.Get(nextPosition)} ({nextPosition.Substract(prevPosition)}) :");
+            //Console.WriteLine($"Move of {nPadMap.Get(prevPosition)} to {nPadMap.Get(nextPosition)} ({nextPosition.Substract(prevPosition)}) :");
             var outputs = new List<List<char>>();
-            var (l1, l2) = Test2(prevPosition, nextPosition, NNO);
+            var (l1, l2) = GetPossibleSequences(prevPosition, nextPosition, NNO);
             outputs.Add(l1);
             if (l2 != null) outputs.Add(l2);
 
@@ -127,104 +205,23 @@ Final result for 2nd star is : {total2}
             return outputs3.OrderBy(s => s.Count).Take(1).Select(l => new string(l.ToArray())).First();
         }
 
-
-        private string FindBest25(Point prevPosition, Point nextPosition)
-        {
-            Console.WriteLine($"Move of {nPadMap.Get(prevPosition)} to {nPadMap.Get(nextPosition)} ({nextPosition.Substract(prevPosition)}) :");
-            var outputs = new List<List<char>>();
-            var (l1, l2) = Test2(prevPosition, nextPosition, DNO);
-            outputs.Add(l1);
-            if (l2 != null) outputs.Add(l2);
-
-            //Robots 1->4
-            var outputs2 = new List<string>();
-            var res = new StringBuilder();
-            foreach (var l in outputs)
-            {
-                res.Clear();
-                var initPos = 'A';
-                for (int i = 0; i < l.Count; i++)
-                {
-                    res.Append(CacheBest5D[(initPos, l[i])]);
-                    initPos = l[i];
-                }
-                outputs2.Add(res.ToString());
-            }
-            var bestOutput = outputs2.OrderBy(s => s.Length).Take(1).First();
-
-            for (int j = 0; j < 5; j++)
-            {
-                res.Clear();
-                var initPos = 'A';
-                for (int i = 0; i < bestOutput.Length; i++)
-                {
-                    res.Append(CacheBest5D[(initPos, bestOutput[i])]);
-                    initPos = bestOutput[i];
-                }
-                bestOutput = res.ToString();
-            }
-            return bestOutput;
-        }
-
-        private string FindBest5D(char c1, char c2)
-        {
-            var prevPosition = GetCharPosD(c1);
-            var nextPosition = GetCharPosD(c2);
-            Console.WriteLine($"Move of {c1} to {c2} ({nextPosition.Substract(prevPosition)}) :");
-            var outputs = new List<List<char>>();
-            var (l1, l2) = Test2(prevPosition, nextPosition, DNO);
-            outputs.Add(l1);
-            if (l2 != null) outputs.Add(l2);
-
-            var outputs2 = new List<List<char>>();
-            foreach (var l in outputs)
-            {
-                outputs2.AddRange(Recurs(new List<char>(), l, 0));
-            }
-
-            var outputs3 = new List<List<char>>();
-            var min = outputs2.Min(l => l.Count);
-            foreach (var l in outputs2.Where(l=>l.Count==min))
-            {
-                outputs3.AddRange(Recurs(new List<char>(), l, 0));
-            }
-
-            var outputs4 = new List<List<char>>();
-            min = outputs3.Min(l => l.Count);
-            foreach (var l in outputs3.Where(l => l.Count == min))
-            {
-                outputs4.AddRange(Recurs(new List<char>(), l, 0));
-            }
-
-            var outputs5 = new List<List<char>>();
-            min = outputs4.Min(l => l.Count);
-            foreach (var l in outputs4.Where(l => l.Count == min))
-            {
-                outputs5.AddRange(Recurs(new List<char>(), l, 0));
-            }
-
-            //foreach (var s in outputs3.Select(l => new string(l.ToArray())).Distinct().OrderBy(s => s.Length))
-            //{
-            //    Console.WriteLine($"\t{new String(s.ToArray())}");
-            //}
-            return outputs5.OrderBy(s => s.Count).Take(1).Select(l => new string(l.ToArray())).First();
-        }
-
-        private static (List<char> l1, List<char>? l2) Test2(Point prevPosition, Point nextPosition, Point no)
+        private static (List<char> l1, List<char>? l2) GetPossibleSequences(Point prevPosition, Point nextPosition, Point no)
         {
             var delta = nextPosition.Substract(prevPosition);
             char dirV = DirToChar(delta.X < 0 ? dirs.north : dirs.south);
             char dirH = DirToChar(delta.Y < 0 ? dirs.west : dirs.east);
-            var output = new List<char>();
-
-            //V before H
-            for (int i = 0; i < Math.Abs(delta.X); i++) output.Add(dirV);
-            for (int i = 0; i < Math.Abs(delta.Y); i++) output.Add(dirH);
-            output.Add('A');
-            List<char> output2 = null;
+            List<char> output = null;
+            if(!(nextPosition.X == no.X && prevPosition.Y == no.Y)) {
+                //V before H
+                output = new List<char>();
+                for (int i = 0; i < Math.Abs(delta.X); i++) output.Add(dirV);
+                for (int i = 0; i < Math.Abs(delta.Y); i++) output.Add(dirH);
+                output.Add('A');
+            }
 
             //We cannot try H before V if H move would go to #
             //If movement is on a single dimension then there is not alternate route, no need to try.            
+            List<char> output2 = null;
             if (delta.X != 0 && delta.Y != 0 && !(nextPosition.Y == no.Y && prevPosition.X == no.X))
             {
                 //H before V
@@ -233,8 +230,14 @@ Final result for 2nd star is : {total2}
                 for (int i = 0; i < Math.Abs(delta.X); i++) output2.Add(dirV);
                 output2.Add('A');
             }
-
-            return (output, output2);
+            if (output != null)
+            {
+                return (output, output2);
+            }
+            else
+            {
+                return (output2,null);
+            }
         }
 
 
@@ -247,7 +250,7 @@ Final result for 2nd star is : {total2}
             var from = (position == 0 ? new Point(0, 2) : GetCharPosD(input[position - 1]));
             var to = GetCharPosD(input[position]);
             var res = new List<List<char>>();
-            var (l1, l2) = Test2(from, to, DNO);
+            var (l1, l2) = GetPossibleSequences(from, to, DNO);
             if (l2 != null)
             {
                 var l = new List<char>(current);
@@ -264,52 +267,6 @@ Final result for 2nd star is : {total2}
             while (q.Count > 0)
             {
                 Console.Write(q.Dequeue());
-            }
-            Console.WriteLine();
-        }
-
-        private void TranscribeN(Queue<char> input, Queue<char> output, Point start)
-        {
-            Point from = start;
-            while (input.Count > 0)
-            {
-                char c = input.Dequeue();
-                Console.Write(c);
-                var to = GetCharPosN(c);
-                var delta = to.Substract(from);
-                //Si on va vers la colonne 0 alors on fait V avant H
-                //Si on va utiliser la touche > (delta.Y>0) alors on fait V avant H
-                bool VbeforeH = (to.X == 3 || from.X == 3 || delta.Y > 0);
-                char dirV = DirToChar(delta.X < 0 ? dirs.north : dirs.south);
-                char dirH = DirToChar(delta.Y < 0 ? dirs.west : dirs.east);
-                if (VbeforeH) for (int i = 0; i < Math.Abs(delta.X); i++) output.Enqueue(dirV);
-                for (int i = 0; i < Math.Abs(delta.Y); i++) output.Enqueue(dirH);
-                if (!VbeforeH) for (int i = 0; i < Math.Abs(delta.X); i++) output.Enqueue(dirV);
-                output.Enqueue('A');
-                from = to;
-            }
-            Console.WriteLine();
-        }
-
-        private void TranscribeD(Queue<char> input, Queue<char> output, Point start)
-        {
-            Point from = start;
-            while (input.Count > 0)
-            {
-                char c = input.Dequeue();
-                Console.Write(c);
-                var to = GetCharPosD(c);
-                var delta = to.Substract(from);
-                //Si on va vers la colonne 0 alors on fait V avant H
-                //Si on va utiliser la touche > (delta.Y>0) alors on fait V avant H
-                bool VbeforeH = (to.Y == 0 || from.Y == 0 || delta.Y > 0);
-                char dirV = DirToChar(delta.X < 0 ? dirs.north : dirs.south);
-                char dirH = DirToChar(delta.Y < 0 ? dirs.west : dirs.east);
-                if (VbeforeH) for (int i = 0; i < Math.Abs(delta.X); i++) output.Enqueue(dirV);
-                for (int i = 0; i < Math.Abs(delta.Y); i++) output.Enqueue(dirH);
-                if (!VbeforeH) for (int i = 0; i < Math.Abs(delta.X); i++) output.Enqueue(dirV);
-                output.Enqueue('A');
-                from = to;
             }
             Console.WriteLine();
         }

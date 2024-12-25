@@ -2,7 +2,6 @@
 
 namespace AdventOfCode2024
 {
-    //Replace 19 by day number
     internal class Day19
     {
         const bool TEST = false;
