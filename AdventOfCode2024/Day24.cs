@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -71,6 +72,12 @@ namespace AdventOfCode2024
                     Evaluated = true;
                 }
             }
+
+            internal void ResetEval()
+            {
+                Evaluated = false;
+                Output = null;
+            }
         }
 
         private Dictionary<String, Gate> gates = new Dictionary<string, Gate>();
@@ -111,6 +118,89 @@ namespace AdventOfCode2024
             }
 
 
+            ResetEval();
+
+            var result = gates.Values.Where(g=>g.Name.StartsWith('z')).OrderByDescending(g=>g.Name).ToList();
+            var sb = new StringBuilder();
+            foreach(var g in result)
+            {
+                sb.Append(g.Output.GetValueOrDefault() ? "1" : "0");
+                //Console.WriteLine($"{g.Name}={(g.Output.GetValueOrDefault()?"1":"0")}");
+            }
+            total1 = Convert.ToInt64(sb.ToString(), 2);
+
+
+            //SetBits('x', "000000000000000000000000000000000000000000000");
+            var swaps = new List<string>() { "z21", "nhn", "khg", "tvb", "z33", "gst","z12","vdc" };
+            SwapGates("z21", "nhn");
+            SwapGates("khg", "tvb");
+            SwapGates("z33", "gst");
+            SwapGates("z12", "vdc");
+            ResetEval();
+
+            PrintBinary('x');
+            PrintBinary('y');
+            PrintBinary('z');
+
+            var x = GetBits('x');
+            var y = GetBits('y');
+            var z = GetBits('z');
+            int retenue = 0;
+            List<int> badGates = new List<int>();
+            for (int i = 0; i < x.Length; i++)
+            {
+                var s = x[i] + y[i] + retenue;
+                if (s == 0)
+                {
+                    retenue = 0;
+                    if (z[i] != 0) badGates.Add(i);
+                }
+                else if (s == 1)
+                {
+                    retenue = 0;
+                    if(z[i] != 1) badGates.Add(i);
+                }
+                else if (s == 2)
+                {
+                    retenue = 1;
+                    if (z[i] != 0) badGates.Add(i);
+                }
+                else if (s == 3)
+                {
+                    retenue = 1;
+                    if (z[i] != 1) badGates.Add(i);
+                }
+            }
+            if (z[z.Length - 1] != retenue)
+            {
+                if (retenue == 1)
+                {
+                    badGates.Add(z.Length - 1);
+                }
+                else
+                {
+                    badGates.Add(z.Length - 1);
+                }
+            }
+            if(badGates.Count > 0)
+            {
+                Console.WriteLine("Bad gate on : " + string.Join(",", badGates));
+            }
+
+            total2 = swaps.Order().Aggregate((s1, s2) => $"{s1},{s2}");
+            //Print out total result
+            Console.WriteLine(
+$@"Final result for 1st star is : {total1}
+Final result for 2nd star is : {total2}
+**************************** END OF DAY 24 ***********************************");
+            Thread.Sleep(1000);
+        }
+
+
+
+        private void ResetEval()
+        {
+            gates.Values.ToList().ForEach(g => g.ResetEval());            
             gates.Values.Where(g => g.Operator == operators.set && !g.Evaluated).ToList().ForEach(g => g.Eval());
             var nonEvaluated = gates.Values.Where(g => g.Operator != operators.set && !g.Evaluated).ToList();
             while (nonEvaluated.Count > 0)
@@ -118,22 +208,61 @@ namespace AdventOfCode2024
                 nonEvaluated.ForEach(g => g.Eval());
                 nonEvaluated = gates.Values.Where(g => g.Operator != operators.set && !g.Evaluated).ToList();
             }
+        }
 
-            var result = gates.Values.Where(g=>g.Name.StartsWith('z')).OrderByDescending(g=>g.Name).ToList();
-            var sb = new StringBuilder();
-            foreach(var g in result)
+        private void SwapGates(string n1, string n2)
+        {
+            var g1 = gates[n1];
+            var g2 = gates[n2];
+            g1.Name = n2;
+            g2.Name = n1;
+            gates[n1] = g2;
+            gates[n2] = g1;
+            foreach(var g in gates.Values.Where(g => g.pOneName == n1))
             {
-                sb.Append(g.Output.GetValueOrDefault() ? "1" : "0");
-                Console.WriteLine($"{g.Name}={(g.Output.GetValueOrDefault()?"1":"0")}");
+                g.PredecessorOne = g2;
             }
-            total1 = Convert.ToInt64(sb.ToString(),2);
+            foreach (var g in gates.Values.Where(g => g.pOneName == n2))
+            {
+                g.PredecessorOne = g1;
+            }
+            foreach (var g in gates.Values.Where(g => g.pTwoName == n1))
+            {
+                g.PredecessorTwo = g2;
+            }
+            foreach (var g in gates.Values.Where(g => g.pTwoName == n2))
+            {
+                g.PredecessorTwo = g1;
+            }
+        }
 
-            //Print out total result
-            Console.WriteLine(
-$@"Final result for 1st star is : {total1}
-Final result for 2nd star is : {total2}
-**************************** END OF DAY 24 ***********************************");
-            Thread.Sleep(1000);
+
+        private void SetBits(char prefix, string value)
+        {
+            for (int i = 0; i < value.Length; i++)
+            {
+                var g = gates[$"{prefix}{i:00}"].InputOne = (value[i] == '1');
+            }
+        }
+
+        private int[] GetBits(char prefix)
+        {
+            return gates.Values
+                        .Where(g => g.Name.StartsWith(prefix))
+                        .OrderBy(g => g.Name)
+                        .Select(g => g.Output.GetValueOrDefault() ? 1 : 0)
+                        .ToArray();
+        }
+
+        private void PrintBinary(char prefix)
+        {
+            var result = gates.Values
+                            .Where(g => g.Name.StartsWith(prefix))
+                            .OrderByDescending(g => g.Name)
+                            .Select(g=>g.Output.GetValueOrDefault() ? "1" : "0")
+                            .Aggregate((s1,s2)=>s1+s2);
+            var resultAsInt = Convert.ToInt64(result, 2);
+            Console.WriteLine($"{result,47} ({resultAsInt})");
         }
 
         private operators GetOperator(string value)
