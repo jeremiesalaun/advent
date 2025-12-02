@@ -6,10 +6,10 @@
         {
             Console.WriteLine("#################################### /\\ ADVENT OF CODE 2025 /\\ ##################################\r\n");
 
+            //new Day1().Run();
+            new Day2().Run();
 
-            new Day1().Run();
             Console.WriteLine("#################################### /\\ END OF CHALLENGE /\\ ##################################\r\n");
-            //await Scoreboard.Show();
         }
     }
 }
