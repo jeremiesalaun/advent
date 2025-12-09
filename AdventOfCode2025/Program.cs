@@ -14,7 +14,8 @@
             //new Day6().Run();
             //new Day7().Run();
             //new Day8().Run();
-            new Day9().Run();
+            //new Day9().Run();
+            new Day10().Run();
 
             Console.WriteLine("#################################### /\\ END OF CHALLENGE /\\ ##################################\r\n");
         }
