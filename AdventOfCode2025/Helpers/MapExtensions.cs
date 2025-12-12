@@ -129,8 +129,8 @@ namespace AdventOfCode2025.Helpers
 
         public static void Print<T>(this T[,] map,Predicate<T>? p=null,ConsoleColor color=ConsoleColor.White)
         {
-            Console.Clear();
-            Console.WriteLine("\x1b[3J");
+            //Console.Clear();
+            //Console.WriteLine("\x1b[3J");
             for (int i = 0; i < map.GetLength(0); i++)
             {
                 for (int j = 0; j < map.GetLength(1); j++)
